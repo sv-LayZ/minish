@@ -1,0 +1,83 @@
+C = cc
+CFLAGS = -Wall -Wextra -Werror -Iinclude
+
+UNAME_S := $(shell uname -s)
+
+ifeq ($(UNAME_S),Darwin) #macOS
+	CFLAGS += -I/opt/homebrew/opt/readline/include
+	LDFLAGS = -L/opt/homebrew/opt/readline/lib
+endif
+
+SRC = src/parsing/lexing/lexer.c \
+	src/parsing/lexing/lexer_utils.c \
+	src/parsing/lexing/detect_type.c \
+	src/parsing/lexing/extract_token_utils.c \
+	src/parsing/parsing.c \
+	src/parsing/parse_tokens.c \
+	src/parsing/parse_redirection.c \
+	src/parsing/parse/parse_utils.c \
+	src/parsing/parse/parse_types.c \
+	src/parsing/expand_variables.c \
+	src/parsing/expand_variables_utils.c \
+	src/parsing/reader.c \
+	src/parsing/lexing/token_type.c \
+	src/parsing/lexing/quote_utils.c \
+	src/signals/signals.c \
+	src/execution/execution.c \
+	src/execution/execution_utils.c \
+	src/execution/execution_external.c \
+	src/execution/execution_redirections.c \
+	src/execution/pipeline.c \
+	src/main.c \
+	src/builtins/builtin_utils.c \
+	src/builtins/builtin_echo.c \
+	src/builtins/builtin_cd.c \
+	src/builtins/builtin_pwd.c \
+	src/builtins/builtin_export.c \
+	src/builtins/builtin_unset.c \
+	src/builtins/builtin_env.c \
+	src/builtins/builtin_exit.c
+	
+HEADER = include/minishell.h
+
+OBJ_DIR = obj
+OBJ = $(SRC:src/%.c=$(OBJ_DIR)/%.o)
+NAME = minishell
+
+all: $(NAME)
+
+LIB_DIR = libft
+LIBFT = $(LIB_DIR)/libft.a
+
+$(NAME): $(OBJ_DIR) $(OBJ) $(LIBFT)
+	$(CC) $(CFLAGS) $(OBJ) -L$(LIB_DIR) -lft $(LDFLAGS) -lreadline -o $(NAME)
+
+$(OBJ_DIR):
+	mkdir -p $(OBJ_DIR)/parsing/lexing
+	mkdir -p $(OBJ_DIR)/parsing/parse
+	mkdir -p $(OBJ_DIR)/signals
+	mkdir -p $(OBJ_DIR)/builtins
+	mkdir -p $(OBJ_DIR)/execution
+
+$(LIBFT): force
+	$(MAKE) -C $(LIB_DIR) bonus
+	
+force:
+
+%.o: %.c $(HEADER) Makefile
+	$(CC) $(CFLAGS) -O3 -c $< -o $@
+
+$(OBJ_DIR)/%.o: src/%.c $(HEADER) Makefile
+	$(CC) $(CFLAGS) -O3 -c $< -o $@
+
+clean:
+	rm -rf $(OBJ_DIR)
+	$(MAKE) -C $(LIB_DIR) clean
+
+fclean: clean
+	rm -f $(NAME)
+	$(MAKE) -C $(LIB_DIR) fclean
+
+re: fclean all
+
+.PHONY: all clean fclean re
