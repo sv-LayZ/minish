@@ -3,17 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   ft_isspace.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: Hadia <Hadia@student.42.fr>                +#+  +:+       +#+        */
+/*   By: mregnaut <mregnaut@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/10 19:21:03 by Hadia             #+#    #+#             */
-/*   Updated: 2025/07/10 19:37:21 by Hadia            ###   ########.fr       */
+/*   Updated: 2025/09/15 19:55:46 by mregnaut         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 int	ft_isspace(int c)
 {
 	if (c == ' ' || c == '\t' || c == '\n' || 
-        c == '\v' || c == '\f' || c == '\r')
-        return (1);
-    return (0);
+		c == '\v' || c == '\f' || c == '\r')
+		return (1);
+	return (0);
 }

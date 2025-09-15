@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   execution_utils.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: Hadia <Hadia@student.42.fr>                +#+  +:+       +#+        */
+/*   By: mregnaut <mregnaut@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/01 00:00:00 by student           #+#    #+#             */
-/*   Updated: 2025/08/22 15:31:07 by Hadia            ###   ########.fr       */
+/*   Updated: 2025/09/15 19:57:35 by mregnaut         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,10 +18,10 @@ static int apply_one_redir(t_redir *r)
 
 	if (r->type == R_IN)
 	{
-		fd = open(r->filename, O_RDONLY);
+		fd = open(r->file, O_RDONLY);
 		if (fd == -1)
 		{
-			perror(r->filename);
+			perror(r->file);
 			return (-1);
 		}
 		if (dup2(fd, STDIN_FILENO) == -1)
@@ -39,10 +39,10 @@ static int apply_one_redir(t_redir *r)
 			flags |= O_APPEND;
 		else
 			flags |= O_TRUNC;
-		fd = open(r->filename, flags, 0644);
+		fd = open(r->file, flags, 0644);
 		if (fd == -1)
 		{
-			perror(r->filename);
+			perror(r->file);
 			return (-1);
 		}
 		if (dup2(fd, STDOUT_FILENO) == -1)

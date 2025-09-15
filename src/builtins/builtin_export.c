@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtin_export.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: Hadia <Hadia@student.42.fr>                +#+  +:+       +#+        */
+/*   By: mregnaut <mregnaut@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/23 21:35:47 by mregnaut          #+#    #+#             */
-/*   Updated: 2025/08/22 15:31:06 by Hadia            ###   ########.fr       */
+/*   Updated: 2025/09/15 19:56:27 by mregnaut         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,6 +69,7 @@ static int	set_var_with_value(char *arg, char *equal_pos)
 static int	set_env_var(char *arg)
 {
 	char	*equal_pos;
+	int		i;
 
 	if (!arg || !*arg || (!ft_isalpha(arg[0]) && arg[0] != '_'))
 	{
@@ -77,7 +78,7 @@ static int	set_env_var(char *arg)
 		ft_putstr_fd("': not a valid identifier\n", 2);
 		return (1);
 	}
-	int i = 1;
+	i = 1;
 	while (arg[i] && arg[i] != '=')
 	{
 		if (!ft_isalnum(arg[i]) && arg[i] != '_')
@@ -89,7 +90,6 @@ static int	set_env_var(char *arg)
 		}
 		i++;
 	}
-
 	equal_pos = ft_strchr(arg, '=');
 	if (!equal_pos)
 		return (set_var_without_value(arg));
