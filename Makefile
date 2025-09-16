@@ -14,6 +14,15 @@ SRC = src/signals/signals.c \
 	src/execution/execution_external.c \
 	src/execution/execution_redirections.c \
 	src/execution/pipeline.c \
+	src/parsing/parsing.c \
+	src/parsing/lexer.c \
+	src/parsing/parser.c \
+	src/parsing/token_utils.c \
+	src/parsing/command_utils.c \
+	src/parsing/redirection_utils.c \
+	src/parsing/parsing_utils.c \
+	src/parsing/debug.c \
+	src/reader.c \
 	src/main.c \
 	src/builtins/builtin_utils.c \
 	src/builtins/builtin_echo.c \
@@ -39,7 +48,7 @@ $(NAME): $(OBJ_DIR) $(OBJ) $(LIBFT)
 	$(CC) $(CFLAGS) $(OBJ) -L$(LIB_DIR) -lft $(LDFLAGS) -lreadline -o $(NAME)
 
 $(OBJ_DIR):
-	mkdir -p $(OBJ_DIR)/parsing/lexing
+	mkdir -p $(OBJ_DIR)/parsing
 	mkdir -p $(OBJ_DIR)/signals
 	mkdir -p $(OBJ_DIR)/builtins
 	mkdir -p $(OBJ_DIR)/execution

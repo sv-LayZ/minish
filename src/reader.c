@@ -1,19 +1,26 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_isspace.c                                       :+:      :+:    :+:   */
+/*   reader.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mregnaut <mregnaut@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/10 19:21:03 by mregnaut          #+#    #+#             */
-/*   Updated: 2025/09/16 03:21:39 by mregnaut         ###   ########.fr       */
+/*   Created: 2025/09/15 20:45:00 by mregnaut          #+#    #+#             */
+/*   Updated: 2025/09/15 20:45:00 by mregnaut         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-int	ft_isspace(int c)
+#include "../include/minishell.h"
+
+char	*reader(void)
 {
-	if (c == ' ' || c == '\t' || c == '\n' || 
-		c == '\v' || c == '\f' || c == '\r')
-		return (1);
-	return (0);
+	char	*line;
+
+	line = readline("minishell$ ");
+	if (!line)
+	{
+		printf("exit\n");
+		exit(g_exit_status);
+	}
+	return (line);
 }
