@@ -3,14 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   signals.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mregnaut <mregnaut@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: Hadia <Hadia@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/31 21:49:53 by mregnaut          #+#    #+#             */
-/*   Updated: 2025/09/16 03:44:47 by mregnaut         ###   ########.fr       */
+/*   Created: 2025/07/31 21:49:53 by Hadia             #+#    #+#             */
+/*   Updated: 2025/07/31 22:26:38 by Hadia            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
+
+volatile sig_atomic_t	g_interrupted = 0;
 
 void	handle_sigint(int sig)
 {
@@ -19,6 +21,7 @@ void	handle_sigint(int sig)
 	rl_on_new_line();
 	rl_replace_line("", 0);
 	rl_redisplay();
+	g_interrupted = 1;
 }
 
 void	setup_sigint(void)
