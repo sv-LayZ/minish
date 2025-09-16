@@ -75,3 +75,75 @@ int apply_redirections(t_redir *redirections)
 	}
 	return (0);
 }
+
+static char	*search_in_paths(char **paths, char *cmd)
+{
+	char	*full_path;
+	char	*temp;
+	int		i;
+
+	i = 0;
+	while (paths[i])
+	{
+		temp = ft_strjoin(paths[i], "/");
+		if (!temp)
+			break ;
+		full_path = ft_strjoin(temp, cmd);
+		free(temp);
+		if (full_path && access(full_path, X_OK) == 0)
+			return (full_path);
+		free(full_path);
+		i++;
+	}
+	return (NULL);
+}
+
+static void	free_string_array(char **array)
+{
+	int	i;
+
+	if (!array)
+		return ;
+	i = 0;
+	while (array[i])
+	{
+		free(array[i]);
+		i++;
+	}
+	free(array);
+}
+
+char	*find_executable_in_path(char *cmd)
+{
+	char	**paths;
+	char	*path_env;
+	char	*result;
+
+	if (!cmd || ft_strchr(cmd, '/'))
+		return (ft_strdup(cmd));
+	path_env = getenv("PATH");
+	if (!path_env)
+		return (NULL);
+	paths = ft_split(path_env, ':');
+	if (!paths)
+		return (NULL);
+	result = search_in_paths(paths, cmd);
+	free_string_array(paths);
+	return (result);
+}
+
+int	setup_input_redirection(t_cmd *cmd)
+{
+	// This function is now handled by apply_redirections
+	// Keep for compatibility but it's no longer used with new structure
+	(void)cmd;
+	return (0);
+}
+
+int	setup_output_redirection(t_cmd *cmd)
+{
+	// This function is now handled by apply_redirections
+	// Keep for compatibility but it's no longer used with new structure
+	(void)cmd;
+	return (0);
+}
