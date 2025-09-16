@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mregnaut <mregnaut@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: dedme <dedme@student.42lyon.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/15 19:58:52 by mregnaut          #+#    #+#             */
-/*   Updated: 2025/09/15 20:02:18 by mregnaut         ###   ########.fr       */
+/*   Updated: 2025/10/16 10:53:27 by dedme            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,8 +37,6 @@
 # define ERROR_MEMORY "Memory allocation error"
 # define ERROR_READING_DIR "Error reading directory"
 
-# define _POSIX_C_SOURCE 200809L
-
 extern int	g_exit_status;
 
 typedef struct s_expand_data
@@ -62,22 +60,15 @@ int		execute_command(t_cmd *cmd);
 int		execute_pipeline(t_cmd *cmd);
 int		setup_input_redirection(t_cmd *cmd);
 int		setup_output_redirection(t_cmd *cmd);
-int		apply_ordered_redirs(t_cmd *cmd);
+int		apply_redirections(t_redir *redirections);
 int		is_builtin(char *cmd);
 int		execute_builtin(int builtin_index, char **args);
 int		execute_external_command(char **args);
 int		execute_with_redirections(t_cmd *cmd);
-char	*find_executable_in_path(char *cmd);
-
-/* EXECUTION */
-char	*find_executable_in_path(char *cmd);
-int		setup_input_redirection(t_cmd *cmd);
-int		setup_output_redirection(t_cmd *cmd);
-int		execute_external_command(char **args);
 int		execute_builtin_with_redirections(t_cmd *cmd, int builtin_index);
 int		execute_external_with_redirections(t_cmd *cmd);
-int		execute_with_redirections(t_cmd *cmd);
-int		execute_command(t_cmd *cmd);
+char	*find_executable_in_path(char *cmd);
+
 
 /* EXECUTABLE */
 t_list	*get_files_in_dir(char *path);

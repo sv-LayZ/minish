@@ -3,16 +3,19 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.h                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mregnaut <mregnaut@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: dedme <dedme@student.42lyon.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/15 19:58:58 by mregnaut          #+#    #+#             */
-/*   Updated: 2025/09/15 20:04:03 by mregnaut         ###   ########.fr       */
+/*   Updated: 2025/10/16 10:53:10 by dedme            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef PARSING_H
 # define PARSING_H
 # include "minishell.h"
+
+/* DEBUGGING */
+# define DEBUGGING 1
 
 /* TOKEN TYPES */
 typedef enum e_token_type
@@ -89,5 +92,8 @@ void		free_redirections(t_redir *head);
 int			is_operator(char c);
 int			is_redirection_token(t_token_type type);
 char		*expand_variables(const char *str);
+
+/* DEBUG FUNCTIONS */
+void		debug_print_cmd(t_cmd *cmd);
 
 #endif
