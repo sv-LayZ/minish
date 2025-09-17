@@ -3,14 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   execution.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: Hadia <Hadia@student.42.fr>                +#+  +:+       +#+        */
+/*   By: mregnaut <mregnaut@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/31 21:50:01 by Hadia             #+#    #+#             */
-/*   Updated: 2025/07/31 22:34:31 by Hadia            ###   ########.fr       */
+/*   Created: 2025/07/31 21:50:01 by mregnaut          #+#    #+#             */
+/*   Updated: 2025/09/16 03:22:04 by dedme            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
+#include "../include/parsing.h"
 
 int	execute_command(t_cmd *cmd)
 {
@@ -19,7 +20,7 @@ int	execute_command(t_cmd *cmd)
 
 	if (!cmd || !cmd->args || !cmd->args[0])
 		return (0);
-	if (cmd->input_file || cmd->output_file)
+	if (cmd->redirections)
 		return (execute_with_redirections(cmd));
 	builtin_index = is_builtin(cmd->args[0]);
 	if (builtin_index != -1)

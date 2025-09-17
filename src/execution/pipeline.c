@@ -3,14 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   pipeline.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: Hadia <Hadia@student.42.fr>                +#+  +:+       +#+        */
+/*   By: mregnaut <mregnaut@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/08/22 12:00:00 by assistant         #+#    #+#             */
-/*   Updated: 2025/08/22 15:31:08 by Hadia            ###   ########.fr       */
+/*   Created: 2025/08/22 12:00:00 by mregnaut          #+#    #+#             */
+/*   Updated: 2025/09/16 03:22:14 by dedme            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
+#include "../include/parsing.h"
 
 static int	count_commands(t_cmd *cmd)
 {
@@ -79,14 +80,8 @@ static int	execute_piped_command(t_cmd *cmd, int pipes[][2],
 		if (setup_pipe_redirections(pipes, cmd_index, total_cmds) == -1)
 			exit(1);
 		close_pipe_fds(pipes, total_cmds - 1);
-		if (cmd->redirs && apply_ordered_redirs(cmd) == -1)
+		if (cmd->redirections && apply_redirections(cmd->redirections) == -1)
 			exit(1);
-		else if (!cmd->redirs)
-		{
-			if (setup_input_redirection(cmd) == -1
-				|| setup_output_redirection(cmd) == -1)
-				exit(1);
-		}
 		builtin_index = is_builtin(cmd->args[0]);
 		if (builtin_index != -1)
 			exit(execute_builtin(builtin_index, cmd->args));

@@ -3,14 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   execution_redirections.c                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: Hadia <Hadia@student.42.fr>                +#+  +:+       +#+        */
+/*   By: mregnaut <mregnaut@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/01/01 00:00:00 by student           #+#    #+#             */
-/*   Updated: 2025/08/22 15:31:06 by Hadia            ###   ########.fr       */
+/*   Created: 2024/01/01 00:00:00 by mregnaut          #+#    #+#             */
+/*   Updated: 2025/09/16 03:21:55 by mregnaut         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
+#include "../include/parsing.h"
 
 extern char	**environ;
 
@@ -27,16 +28,9 @@ int	execute_builtin_with_redirections(t_cmd *cmd, int builtin_index)
 	}
 	if (pid == 0)
 	{
-		if (cmd->redirs)
+		if (cmd->redirections)
 		{
-			if (apply_ordered_redirs(cmd) == -1)
-				exit(1);
-		}
-		else
-		{
-			if (setup_input_redirection(cmd) == -1)
-				exit(1);
-			if (setup_output_redirection(cmd) == -1)
+			if (apply_redirections(cmd->redirections) == -1)
 				exit(1);
 		}
 		exit(execute_builtin(builtin_index, cmd->args));
@@ -52,16 +46,9 @@ int	execute_builtin_with_redirections(t_cmd *cmd, int builtin_index)
 
 static int	execute_child_with_redirections(t_cmd *cmd, char *executable_path)
 {
-	if (cmd->redirs)
+	if (cmd->redirections)
 	{
-		if (apply_ordered_redirs(cmd) == -1)
-			exit(1);
-	}
-	else
-	{
-		if (setup_input_redirection(cmd) == -1)
-			exit(1);
-		if (setup_output_redirection(cmd) == -1)
+		if (apply_redirections(cmd->redirections) == -1)
 			exit(1);
 	}
 	if (execve(executable_path, cmd->args, environ) == -1)

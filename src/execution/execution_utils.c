@@ -6,17 +6,18 @@
 /*   By: mregnaut <mregnaut@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/01 00:00:00 by student           #+#    #+#             */
-/*   Updated: 2025/09/15 19:57:35 by mregnaut         ###   ########.fr       */
+/*   Updated: 2025/09/15 19:57:35 by dedme            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
+#include "../include/parsing.h"
 
 static int apply_one_redir(t_redir *r)
 {
 	int fd;
 
-	if (r->type == R_IN)
+	if (r->type == TOKEN_REDIRECT_IN)
 	{
 		fd = open(r->file, O_RDONLY);
 		if (fd == -1)
@@ -32,10 +33,10 @@ static int apply_one_redir(t_redir *r)
 		}
 		close(fd);
 	}
-	else if (r->type == R_OUT_TRUNC || r->type == R_OUT_APPEND)
+	else if (r->type == TOKEN_REDIRECT_OUT || r->type == TOKEN_REDIRECT_APPEND)
 	{
 		int flags = O_WRONLY | O_CREAT;
-		if (r->type == R_OUT_APPEND)
+		if (r->type == TOKEN_REDIRECT_APPEND)
 			flags |= O_APPEND;
 		else
 			flags |= O_TRUNC;
@@ -53,7 +54,7 @@ static int apply_one_redir(t_redir *r)
 		}
 		close(fd);
 	}
-	else if (r->type == R_HEREDOC)
+	else if (r->type == TOKEN_HEREDOC)
 	{
 		ft_putstr_fd("minishell: heredoc not implemented yet\n", 2);
 		return (-1);
@@ -61,11 +62,11 @@ static int apply_one_redir(t_redir *r)
 	return (0);
 }
 
-int apply_ordered_redirs(t_cmd *cmd)
+int apply_redirections(t_redir *redirections)
 {
 	t_redir *r;
 
-	r = cmd->redirs;
+	r = redirections;
 	while (r)
 	{
 		if (apply_one_redir(r) == -1)
@@ -133,55 +134,16 @@ char	*find_executable_in_path(char *cmd)
 
 int	setup_input_redirection(t_cmd *cmd)
 {
-	int	fd;
-
-	if (!cmd->input_file)
-		return (0);
-	if (cmd->heredoc)
-	{
-		ft_putstr_fd("minishell: heredoc not implemented yet\n", 2);
-		return (-1);
-	}
-	fd = open(cmd->input_file, O_RDONLY);
-	if (fd == -1)
-	{
-		perror(cmd->input_file);
-		return (-1);
-	}
-	if (dup2(fd, STDIN_FILENO) == -1)
-	{
-		perror("dup2");
-		close(fd);
-		return (-1);
-	}
-	close(fd);
+	// This function is now handled by apply_redirections
+	// Keep for compatibility but it's no longer used with new structure
+	(void)cmd;
 	return (0);
 }
 
 int	setup_output_redirection(t_cmd *cmd)
 {
-	int	fd;
-	int	flags;
-
-	if (!cmd->output_file)
-		return (0);
-	flags = O_WRONLY | O_CREAT;
-	if (cmd->append_output)
-		flags |= O_APPEND;
-	else
-		flags |= O_TRUNC;
-	fd = open(cmd->output_file, flags, 0644);
-	if (fd == -1)
-	{
-		perror(cmd->output_file);
-		return (-1);
-	}
-	if (dup2(fd, STDOUT_FILENO) == -1)
-	{
-		perror("dup2");
-		close(fd);
-		return (-1);
-	}
-	close(fd);
+	// This function is now handled by apply_redirections
+	// Keep for compatibility but it's no longer used with new structure
+	(void)cmd;
 	return (0);
 }
