@@ -6,7 +6,7 @@
 /*   By: dedme <dedme@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/15 20:06:00 by mregnaut          #+#    #+#             */
-/*   Updated: 2025/09/18 23:51:44 by dedme            ###   ########.fr       */
+/*   Updated: 2025/09/21 21:33:05 by dedme            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,18 +60,29 @@ static int	get_operator_length(const char *line, int i)
 	return (0);
 }
 
+/*si pas de quotes au debut de line quote = 0 si simple quote 1 si double quotes 2*/
 static char	*extract_word(const char *line, int start, int end)
 {
 	char	*word;
 	int		i;
+	int		quote;
 
+	quote = 0;
+	if (start > 0)
+	{
+		if (line[start - 1] == '\'')
+			quote = 1;
+		else if	(line[start - 1] == '"')
+			quote = 2;
+	}
+	printf("\nwords[%d] = %c\nquote = %d\n", start, line[start], quote);
 	word = malloc(sizeof(char) * (end - start + 1));
 	if (!word)
 		return (NULL);
 	i = 0;
 	while (start < end)
 	{
-		if (line[start] != '\'' && line[start] != '"')
+		if ((quote == 0) || ((line[start] != '\'' && quote == 1) || (line[start] != '"' && quote == 2)))
 			word[i++] = line[start];
 		start++;
 	}
