@@ -6,7 +6,7 @@
 /*   By: dedme <dedme@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/15 20:06:00 by mregnaut          #+#    #+#             */
-/*   Updated: 2025/09/21 21:33:05 by dedme            ###   ########.fr       */
+/*   Updated: 2025/09/22 20:29:14 by dedme            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,27 +22,22 @@ static int	skip_whitespace(const char *line, int i)
 
 static int	handle_quotes(const char *line, int i, t_quote_type *quote)
 {
-	printf("%c\n", line[i]);
 	if (line[i] == '\'' && *quote == NO_QUOTE)
 	{
-		printf("open quote\n");
 		*quote = SINGLE_QUOTE;
 		return (i + 1);
 	}
 	else if (line[i] == '\'' && *quote == SINGLE_QUOTE)
 	{
-		printf("already open\n");
 		return (i + 1);
 	}
 	else if (line[i] == '"' && *quote == NO_QUOTE)
 	{
-		printf("double quote open\n");
 		*quote = DOUBLE_QUOTE;
 		return (i + 1);
 	}
 	else if (line[i] == '"' && *quote == DOUBLE_QUOTE)
 	{
-		printf("double quote already\n");
 		*quote = NO_QUOTE;
 		return (i+1);
 	}
@@ -75,7 +70,6 @@ static char	*extract_word(const char *line, int start, int end)
 		else if	(line[start - 1] == '"')
 			quote = 2;
 	}
-	printf("\nwords[%d] = %c\nquote = %d\n", start, line[start], quote);
 	word = malloc(sizeof(char) * (end - start + 1));
 	if (!word)
 		return (NULL);
@@ -128,7 +122,6 @@ static t_token	*tokenize_line(const char *line)
 				|| (!ft_isspace(line[i]) && get_operator_length(line, i) == 0)))
 		{
 			i = handle_quotes(line, i, &quote);
-			printf("line[%d] = %c\n", i, line[i]);
 			if (line[i] && (quote != NO_QUOTE
 					|| (!ft_isspace(line[i])
 						&& get_operator_length(line, i) == 0)))
