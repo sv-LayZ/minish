@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   execution_utils.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mregnaut <mregnaut@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: dedme <dedme@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/01 00:00:00 by student           #+#    #+#             */
-/*   Updated: 2025/09/15 19:57:35 by dedme            ###   ########.fr       */
+/*   Updated: 2025/09/22 15:10:52 by dedme            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,6 +56,7 @@ static int apply_one_redir(t_redir *r)
 	}
 	else if (r->type == TOKEN_HEREDOC)
 	{
+		printf("%s\n", );
 		ft_putstr_fd("minishell: heredoc not implemented yet\n", 2);
 		return (-1);
 	}
@@ -146,4 +147,12 @@ int	setup_output_redirection(t_cmd *cmd)
 	// Keep for compatibility but it's no longer used with new structure
 	(void)cmd;
 	return (0);
+}
+
+/*utilise des fichier temporaire pour stocker le heredoc*/
+
+int handle_heredoc(char *delimiter)
+{
+    int     fd;
+    return (fd);
 }
