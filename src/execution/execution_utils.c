@@ -6,7 +6,7 @@
 /*   By: dedme <dedme@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/01 00:00:00 by student           #+#    #+#             */
-/*   Updated: 2025/09/22 18:09:08 by dedme            ###   ########.fr       */
+/*   Updated: 2025/09/22 23:46:10 by dedme            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,7 +80,7 @@ static int apply_one_redir(t_redir *r)
 			perror(r->file);
 			return (-1);
 		}
-		if (dup2(fd, STDOUT_FILENO) == -1)
+		if (dup2(fd, STDIN_FILENO) == -1)
 		{
 			perror("dup2");
 			close(fd);
@@ -93,8 +93,7 @@ static int apply_one_redir(t_redir *r)
 		fd = handle_heredoc(r->file);
 		if (fd == -1)
 			return(-1);
-		printf("feur\n");
-		if (dup2(fd, STDOUT_FILENO) == -1)
+		if (dup2(fd, STDIN_FILENO) == -1)
 		{
 			perror("dup2");
 			close(fd);
