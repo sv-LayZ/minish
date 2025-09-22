@@ -6,12 +6,46 @@
 /*   By: dedme <dedme@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/01 00:00:00 by student           #+#    #+#             */
-/*   Updated: 2025/09/22 15:10:52 by dedme            ###   ########.fr       */
+/*   Updated: 2025/09/22 18:09:08 by dedme            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 #include "../include/parsing.h"
+
+int handle_heredoc(char *delimiter)
+{
+	int     fd;
+	char    *line;
+	char    *tmpfile = "/tmp/minishell_heredoc";
+
+	fd = open(tmpfile, O_CREAT | O_WRONLY | O_TRUNC, 0644);
+	if (fd == -1)
+	{
+		perror("open heredoc");
+		return (-1);
+	}
+	while (1)
+	{
+		line = readline("> ");
+		if (!line || ft_strcmp(line, delimiter) == 0)
+		{
+			free(line);
+			break;
+		}
+		ft_putendl_fd(line, fd);
+		free(line);
+	}
+	close(fd);
+
+	fd = open(tmpfile, O_RDONLY);
+	if (fd == -1)
+	{
+		perror("open heredoc read");
+		return (-1);
+	}
+	return (fd);
+}
 
 static int apply_one_redir(t_redir *r)
 {
@@ -56,9 +90,16 @@ static int apply_one_redir(t_redir *r)
 	}
 	else if (r->type == TOKEN_HEREDOC)
 	{
-		printf("%s\n", );
-		ft_putstr_fd("minishell: heredoc not implemented yet\n", 2);
-		return (-1);
+		fd = handle_heredoc(r->file);
+		if (fd == -1)
+			return(-1);
+		printf("feur\n");
+		if (dup2(fd, STDOUT_FILENO) == -1)
+		{
+			perror("dup2");
+			close(fd);
+			return (-1);
+		}
 	}
 	return (0);
 }
@@ -147,12 +188,4 @@ int	setup_output_redirection(t_cmd *cmd)
 	// Keep for compatibility but it's no longer used with new structure
 	(void)cmd;
 	return (0);
-}
-
-/*utilise des fichier temporaire pour stocker le heredoc*/
-
-int handle_heredoc(char *delimiter)
-{
-    int     fd;
-    return (fd);
 }
