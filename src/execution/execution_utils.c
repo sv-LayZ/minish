@@ -6,19 +6,26 @@
 /*   By: dedme <dedme@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/01 00:00:00 by student           #+#    #+#             */
-/*   Updated: 2025/09/22 23:46:10 by dedme            ###   ########.fr       */
+/*   Updated: 2025/09/23 02:20:41 by dedme            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 #include "../include/parsing.h"
 
-int handle_heredoc(char *delimiter)
+int handle_heredoc(char *delimiter, int count)
 {
 	int     fd;
 	char    *line;
-	char    *tmpfile = "/tmp/minishell_heredoc";
-
+	char    *tmpfile;
+	
+	
+	tmpfile = ft_strjoin("/tmp/heredoc_", ft_itoa(count));
+	if (!tmpfile)
+	{
+		perror("malloc malfunction");
+		return (-1);
+	}
 	fd = open(tmpfile, O_CREAT | O_WRONLY | O_TRUNC, 0644);
 	if (fd == -1)
 	{
@@ -44,10 +51,11 @@ int handle_heredoc(char *delimiter)
 		perror("open heredoc read");
 		return (-1);
 	}
+	free(tmpfile);
 	return (fd);
 }
 
-static int apply_one_redir(t_redir *r)
+static int apply_one_redir(t_redir *r, int count)
 {
 	int fd;
 
@@ -90,7 +98,7 @@ static int apply_one_redir(t_redir *r)
 	}
 	else if (r->type == TOKEN_HEREDOC)
 	{
-		fd = handle_heredoc(r->file);
+		fd = handle_heredoc(r->file, count);
 		if (fd == -1)
 			return(-1);
 		if (dup2(fd, STDIN_FILENO) == -1)
@@ -99,6 +107,7 @@ static int apply_one_redir(t_redir *r)
 			close(fd);
 			return (-1);
 		}
+		close(fd);
 	}
 	return (0);
 }
@@ -106,11 +115,13 @@ static int apply_one_redir(t_redir *r)
 int apply_redirections(t_redir *redirections)
 {
 	t_redir *r;
+	int		count;
 
 	r = redirections;
+	count = 0;
 	while (r)
 	{
-		if (apply_one_redir(r) == -1)
+		if (apply_one_redir(r, count++) == -1)
 			return (-1);
 		r = r->next;
 	}
