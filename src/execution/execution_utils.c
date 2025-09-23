@@ -6,7 +6,7 @@
 /*   By: dedme <dedme@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/01 00:00:00 by student           #+#    #+#             */
-/*   Updated: 2025/09/23 02:20:41 by dedme            ###   ########.fr       */
+/*   Updated: 2025/09/24 01:15:07 by dedme            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,6 +107,7 @@ static int apply_one_redir(t_redir *r, int count)
 			close(fd);
 			return (-1);
 		}
+		unlink(ft_strjoin("/tmp/heredoc_", ft_itoa(count)));
 		close(fd);
 	}
 	return (0);
