@@ -6,20 +6,19 @@
 /*   By: dedme <dedme@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/01 00:00:00 by student           #+#    #+#             */
-/*   Updated: 2025/09/24 01:15:07 by dedme            ###   ########.fr       */
+/*   Updated: 2025/09/24 02:45:03 by dedme            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 #include "../include/parsing.h"
 
-int handle_heredoc(char *delimiter, int count)
+int	handle_heredoc(char *delimiter, int count)
 {
-	int     fd;
-	char    *line;
-	char    *tmpfile;
-	
-	
+	int		fd;
+	char	*line;
+	char	*tmpfile;
+
 	tmpfile = ft_strjoin("/tmp/heredoc_", ft_itoa(count));
 	if (!tmpfile)
 	{
@@ -38,13 +37,12 @@ int handle_heredoc(char *delimiter, int count)
 		if (!line || ft_strcmp(line, delimiter) == 0)
 		{
 			free(line);
-			break;
+			break ;
 		}
 		ft_putendl_fd(line, fd);
 		free(line);
 	}
 	close(fd);
-
 	fd = open(tmpfile, O_RDONLY);
 	if (fd == -1)
 	{
@@ -55,9 +53,10 @@ int handle_heredoc(char *delimiter, int count)
 	return (fd);
 }
 
-static int apply_one_redir(t_redir *r, int count)
+static int	apply_one_redir(t_redir *r, int count)
 {
-	int fd;
+	int	fd;
+	int	flags;	
 
 	if (r->type == TOKEN_REDIRECT_IN)
 	{
@@ -77,7 +76,7 @@ static int apply_one_redir(t_redir *r, int count)
 	}
 	else if (r->type == TOKEN_REDIRECT_OUT || r->type == TOKEN_REDIRECT_APPEND)
 	{
-		int flags = O_WRONLY | O_CREAT;
+		flags = O_WRONLY | O_CREAT;
 		if (r->type == TOKEN_REDIRECT_APPEND)
 			flags |= O_APPEND;
 		else
@@ -100,7 +99,7 @@ static int apply_one_redir(t_redir *r, int count)
 	{
 		fd = handle_heredoc(r->file, count);
 		if (fd == -1)
-			return(-1);
+			return (-1);
 		if (dup2(fd, STDIN_FILENO) == -1)
 		{
 			perror("dup2");
@@ -113,9 +112,9 @@ static int apply_one_redir(t_redir *r, int count)
 	return (0);
 }
 
-int apply_redirections(t_redir *redirections)
+int	apply_redirections(t_redir *redirections)
 {
-	t_redir *r;
+	t_redir	*r;
 	int		count;
 
 	r = redirections;
