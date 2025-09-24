@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dedme <dedme@student.42lyon.fr>            +#+  +:+       +#+        */
+/*   By: dedme <dedme@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/15 19:58:52 by mregnaut          #+#    #+#             */
-/*   Updated: 2025/10/16 10:53:27 by dedme            ###   ########.fr       */
+/*   Updated: 2025/09/24 19:44:26 by dedme            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,7 @@ void	setup_sigint(void);
 void	setup_sigquit(void);
 void	handle_sigint(int sig);
 void	handle_signals(void);
+void	handle_signals_heredoc(int sig);
 /* PARSING */
 char	*reader(void);
 void	print_commands(t_cmd *cmds);

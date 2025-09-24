@@ -6,7 +6,7 @@
 /*   By: dedme <dedme@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/01 00:00:00 by student           #+#    #+#             */
-/*   Updated: 2025/09/24 02:45:03 by dedme            ###   ########.fr       */
+/*   Updated: 2025/09/24 20:00:10 by dedme            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,8 @@ int	handle_heredoc(char *delimiter, int count)
 	char	*line;
 	char	*tmpfile;
 
+    signal(SIGINT, handle_signals_heredoc);
+    signal(SIGQUIT, SIG_IGN);
 	tmpfile = ft_strjoin("/tmp/heredoc_", ft_itoa(count));
 	if (!tmpfile)
 	{
@@ -34,6 +36,13 @@ int	handle_heredoc(char *delimiter, int count)
 	while (1)
 	{
 		line = readline("> ");
+		if (g_exit_status != 0)
+		{
+			close(fd);
+			free(line);
+			unlink(tmpfile);
+			return(-1);
+		}
 		if (!line || ft_strcmp(line, delimiter) == 0)
 		{
 			free(line);
@@ -99,7 +108,11 @@ static int	apply_one_redir(t_redir *r, int count)
 	{
 		fd = handle_heredoc(r->file, count);
 		if (fd == -1)
+		{
+			rl_on_new_line();
+			rl_redisplay();
 			return (-1);
+		}
 		if (dup2(fd, STDIN_FILENO) == -1)
 		{
 			perror("dup2");
