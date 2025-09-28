@@ -15,52 +15,54 @@
 
 int	handle_heredoc(char *delimiter, int count)
 {
-	int		fd;
-	char	*line;
-	char	*tmpfile;
+    int					fd;
+    char				*line;
+    char				*tmpfile;
 
     signal(SIGINT, handle_signals_heredoc);
     signal(SIGQUIT, SIG_IGN);
-	tmpfile = ft_strjoin("/tmp/heredoc_", ft_itoa(count));
-	if (!tmpfile)
-	{
-		perror("malloc malfunction");
-		return (-1);
-	}
-	fd = open(tmpfile, O_CREAT | O_WRONLY | O_TRUNC, 0644);
-	if (fd == -1)
-	{
-		perror("open heredoc");
-		return (-1);
-	}
-	while (1)
-	{
-		line = readline("> ");
-		if (g_exit_status == 130)
-		{
-			g_exit_status = 0;
-			close(fd);
-			free(line);
-			unlink(tmpfile);
-			return(-1);
-		}
-		if (!line || ft_strcmp(line, delimiter) == 0)
-		{
-			free(line);
-			break ;
-		}
-		ft_putendl_fd(line, fd);
-		free(line);
-	}
-	close(fd);
-	fd = open(tmpfile, O_RDONLY);
-	if (fd == -1)
-	{
-		perror("open heredoc read");
-		return (-1);
-	}
-	free(tmpfile);
-	return (fd);
+    tmpfile = ft_strjoin("/tmp/heredoc_", ft_itoa(count));
+    if (!tmpfile)
+    {
+        perror("malloc malfunction");
+        return (-1);
+    }
+    fd = open(tmpfile, O_CREAT | O_WRONLY | O_TRUNC, 0644);
+    if (fd == -1)
+    {
+        perror("open heredoc");
+        return (-1);
+    }
+    while (1)
+    {
+        line = readline("> ");
+        if (g_exit_status == 130)
+        {
+            g_exit_status = 0;
+            close(fd);
+			if (line)
+            	free(line);
+            unlink(tmpfile);
+            return(-1);
+        }
+        if (!line || ft_strcmp(line, delimiter) == 0)
+        {
+			if (line)
+            	free(line);
+            break ;
+        }
+        ft_putendl_fd(line, fd);
+        free(line);
+    }
+    close(fd);
+    fd = open(tmpfile, O_RDONLY);
+    if (fd == -1)
+    {
+        perror("open heredoc read");
+        return (-1);
+    }
+    free(tmpfile);
+    return (fd);
 }
 
 static int	apply_one_redir(t_redir *r, int count)
@@ -107,7 +109,9 @@ static int	apply_one_redir(t_redir *r, int count)
 	}
 	else if (r->type == TOKEN_HEREDOC)
 	{
+		close_sig();
 		fd = handle_heredoc(r->file, count);
+		handle_signals();
 		if (fd == -1)
 		{
 			return (-1);

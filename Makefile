@@ -9,6 +9,7 @@ ifeq ($(UNAME_S),Darwin) #macOS
 endif
 
 SRC = src/signals/signals.c \
+	src/signals/close_signals.c \
 	src/execution/execution.c \
 	src/execution/execution_utils.c \
 	src/execution/execution_external.c \

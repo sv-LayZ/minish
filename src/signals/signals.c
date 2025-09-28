@@ -49,8 +49,8 @@ void	handle_signals(void)
 
 void	handle_signals_heredoc(int sig)
 {
-    g_exit_status = 130 + (sig * 0);
-	write(1, "\n", 1);
+	(void)sig;
+    g_exit_status = 130;
 	rl_replace_line("", 0);
 	rl_done = 1;
 }

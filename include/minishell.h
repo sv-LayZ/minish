@@ -52,6 +52,7 @@ void	setup_sigquit(void);
 void	handle_sigint(int sig);
 void	handle_signals(void);
 void	handle_signals_heredoc(int sig);
+void	close_sig(void);
 /* PARSING */
 char	*reader(void);
 void	print_commands(t_cmd *cmds);
