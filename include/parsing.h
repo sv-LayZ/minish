@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.h                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dedme <dedme@student.42.fr>                +#+  +:+       +#+        */
+/*   By: dedme <dedme@student.42lyon.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/15 19:58:58 by mregnaut          #+#    #+#             */
-/*   Updated: 2025/09/29 20:05:49 by dedme            ###   ########.fr       */
+/*   Updated: 2025/10/16 10:53:10 by dedme            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,9 +53,7 @@ typedef struct s_token
 typedef struct s_redir
 {
 	t_token_type		type;
-	char			*file;          /* filename or delimiter for heredoc */
-	char			*heredoc_path;  /* allocated path if heredoc materialized */
-	int				heredoc_done;   /* 1 if heredoc already read */
+	char				*file;
 	struct s_redir		*next;
 }	t_redir;
 
