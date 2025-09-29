@@ -6,7 +6,7 @@
 /*   By: dedme <dedme@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/29 00:00:00 by ai-helper         #+#    #+#             */
-/*   Updated: 2025/09/29 01:26:09 by dedme            ###   ########.fr       */
+/*   Updated: 2025/09/29 20:05:49 by dedme            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,14 +38,17 @@ int	consume_heredocs(t_redir *redirections)
 			handle_signals();
 			if (fd == -1)
 				return (1);
-			close(fd);
-			/* remove temp file */
+			/* Build temp name and keep path so execution phase can reopen last one */
 			tmp_name = ft_strjoin("/tmp/heredoc_", ft_itoa(count));
-			if (tmp_name)
+			if (!tmp_name)
 			{
-				unlink(tmp_name);
-				free(tmp_name);
+				close(fd);
+				return (1);
 			}
+			/* We already have fd opened READONLY by handle_heredoc (reopened inside). */
+			redirections->heredoc_path = tmp_name;
+			redirections->heredoc_done = 1;
+			close(fd);
 			count++;
 		}
 		redirections = redirections->next;

@@ -6,7 +6,7 @@
 /*   By: dedme <dedme@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 23:00:58 by mregnaut          #+#    #+#             */
-/*   Updated: 2025/09/29 02:24:37 by dedme            ###   ########.fr       */
+/*   Updated: 2025/09/29 20:05:49 by dedme            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,19 @@ int	main(int ac, char **av)
 				}
 			}
 			else if (cmds->args && cmds->args[0])
-				g_exit_status = execute_pipeline(cmds);
+			{
+				/* Bash lit tous les heredocs d'une ligne avant de lancer la commande/pipeline. */
+				{
+					t_cmd *c = cmds;
+					while (c)
+					{
+						consume_heredocs(c->redirections);
+						c = c->next;
+					}
+				}
+				if (g_exit_status == 0)
+					g_exit_status = execute_pipeline(cmds);
+			}
 		}
 		free_commands(cmds);
 		free(line);
