@@ -3,19 +3,72 @@
 /*                                                        :::      ::::::::   */
 /*   execution_utils.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mregnaut <mregnaut@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: dedme <dedme@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/01 00:00:00 by student           #+#    #+#             */
-/*   Updated: 2025/09/15 19:57:35 by dedme            ###   ########.fr       */
+/*   Updated: 2025/09/29 20:05:49 by dedme            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 #include "../include/parsing.h"
 
-static int apply_one_redir(t_redir *r)
+int	handle_heredoc(char *delimiter, int count)
 {
-	int fd;
+    int					fd;
+    char				*line;
+    char				*tmpfile;
+
+    signal(SIGINT, handle_signals_heredoc);
+    signal(SIGQUIT, SIG_IGN);
+    tmpfile = ft_strjoin("/tmp/heredoc_", ft_itoa(count));
+    if (!tmpfile)
+    {
+        perror("malloc malfunction");
+        return (-1);
+    }
+    fd = open(tmpfile, O_CREAT | O_WRONLY | O_TRUNC, 0644);
+    if (fd == -1)
+    {
+        perror("open heredoc");
+        return (-1);
+    }
+    while (1)
+    {
+        line = readline("> ");
+        if (g_exit_status == 130)
+        {
+            g_exit_status = 0;
+            close(fd);
+			if (line)
+            	free(line);
+            unlink(tmpfile);
+            return (-1);
+        }
+        if (!line || ft_strcmp(line, delimiter) == 0)
+        {
+			if (line)
+            	free(line);
+            break ;
+        }
+        ft_putendl_fd(line, fd);
+        free(line);
+    }
+    close(fd);
+    fd = open(tmpfile, O_RDONLY);
+    if (fd == -1)
+    {
+        perror("open heredoc read");
+        return (-1);
+    }
+    free(tmpfile);
+    return (fd);
+}
+
+static int	apply_one_redir(t_redir *r, int count)
+{
+	int	fd;
+	int	flags;	
 
 	if (r->type == TOKEN_REDIRECT_IN)
 	{
@@ -35,7 +88,7 @@ static int apply_one_redir(t_redir *r)
 	}
 	else if (r->type == TOKEN_REDIRECT_OUT || r->type == TOKEN_REDIRECT_APPEND)
 	{
-		int flags = O_WRONLY | O_CREAT;
+		flags = O_WRONLY | O_CREAT;
 		if (r->type == TOKEN_REDIRECT_APPEND)
 			flags |= O_APPEND;
 		else
@@ -46,7 +99,7 @@ static int apply_one_redir(t_redir *r)
 			perror(r->file);
 			return (-1);
 		}
-		if (dup2(fd, STDOUT_FILENO) == -1)
+		if (dup2(fd, STDIN_FILENO) == -1)
 		{
 			perror("dup2");
 			close(fd);
@@ -56,20 +109,57 @@ static int apply_one_redir(t_redir *r)
 	}
 	else if (r->type == TOKEN_HEREDOC)
 	{
-		ft_putstr_fd("minishell: heredoc not implemented yet\n", 2);
-		return (-1);
+		/* If heredoc was pre-consumed (no command case or earlier pass), reuse it */
+		if (r->heredoc_done && r->heredoc_path)
+		{
+			fd = open(r->heredoc_path, O_RDONLY);
+			if (fd == -1)
+			{
+				perror("open heredoc");
+				return (-1);
+			}
+		}
+		else
+		{
+			close_sig();
+			fd = handle_heredoc(r->file, count);
+			handle_signals();
+			if (fd == -1)
+				return (-1);
+		}
+		if (dup2(fd, STDIN_FILENO) == -1)
+		{
+			perror("dup2");
+			close(fd);
+			return (-1);
+		}
+		close(fd);
+		/* Cleanup only if just created now (not keeping for later); if path stored, unlink after dup */
+		if (r->heredoc_done && r->heredoc_path)
+			unlink(r->heredoc_path);
+		else
+		{
+			char *tmp = ft_strjoin("/tmp/heredoc_", ft_itoa(count));
+			if (tmp)
+			{
+				unlink(tmp);
+				free(tmp);
+			}
+		}
 	}
 	return (0);
 }
 
-int apply_redirections(t_redir *redirections)
+int	apply_redirections(t_redir *redirections)
 {
-	t_redir *r;
+	t_redir	*r;
+	int		count;
 
 	r = redirections;
+	count = 0;
 	while (r)
 	{
-		if (apply_one_redir(r) == -1)
+		if (apply_one_redir(r, count++) == -1)
 			return (-1);
 		r = r->next;
 	}

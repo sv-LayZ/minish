@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dedme <dedme@student.42lyon.fr>            +#+  +:+       +#+        */
+/*   By: dedme <dedme@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/15 19:58:52 by mregnaut          #+#    #+#             */
-/*   Updated: 2025/10/16 10:53:27 by dedme            ###   ########.fr       */
+/*   Updated: 2025/09/29 01:26:09 by dedme            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,8 @@ void	setup_sigint(void);
 void	setup_sigquit(void);
 void	handle_sigint(int sig);
 void	handle_signals(void);
+void	handle_signals_heredoc(int sig);
+void	close_sig(void);
 /* PARSING */
 char	*reader(void);
 void	print_commands(t_cmd *cmds);
@@ -68,6 +70,8 @@ int		execute_with_redirections(t_cmd *cmd);
 int		execute_builtin_with_redirections(t_cmd *cmd, int builtin_index);
 int		execute_external_with_redirections(t_cmd *cmd);
 char	*find_executable_in_path(char *cmd);
+int		consume_heredocs(t_redir *redirections);
+int		handle_heredoc(char *delimiter, int count);
 
 
 /* EXECUTABLE */

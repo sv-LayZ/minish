@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   redirection_utils.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mregnaut <mregnaut@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: dedme <dedme@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/15 20:10:00 by mregnaut          #+#    #+#             */
-/*   Updated: 2025/09/15 21:33:01 by mregnaut         ###   ########.fr       */
+/*   Updated: 2025/09/29 20:05:49 by dedme            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,8 @@ t_redir	*create_redirection(t_token_type type, char *file)
 		return (NULL);
 	redir->type = type;
 	redir->file = file;
+	redir->heredoc_path = NULL;
+	redir->heredoc_done = 0;
 	redir->next = NULL;
 	return (redir);
 }
@@ -55,6 +57,8 @@ void	free_redirections(t_redir *head)
 	{
 		next = current->next;
 		free(current->file);
+		if (current->heredoc_path)
+			free(current->heredoc_path);
 		free(current);
 		current = next;
 	}

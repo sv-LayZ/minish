@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lexer.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dedme <dedme@student.42lyon.fr>            +#+  +:+       +#+        */
+/*   By: dedme <dedme@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/15 20:06:00 by mregnaut          #+#    #+#             */
-/*   Updated: 2025/10/15 09:05:58 by dedme            ###   ########.fr       */
+/*   Updated: 2025/09/22 18:12:12 by dedme            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,6 @@ static int	handle_quotes(const char *line, int i, t_quote_type *quote)
 	}
 	else if (line[i] == '\'' && *quote == SINGLE_QUOTE)
 	{
-		*quote = NO_QUOTE;
 		return (i + 1);
 	}
 	else if (line[i] == '"' && *quote == NO_QUOTE)
@@ -40,7 +39,7 @@ static int	handle_quotes(const char *line, int i, t_quote_type *quote)
 	else if (line[i] == '"' && *quote == DOUBLE_QUOTE)
 	{
 		*quote = NO_QUOTE;
-		return (i + 1);
+		return (i+1);
 	}
 	return (i);
 }
@@ -56,19 +55,29 @@ static int	get_operator_length(const char *line, int i)
 	return (0);
 }
 
+/*si pas de quotes au debut de line quote = 0 si simple quote 1 si double quotes 2*/
 static char	*extract_word(const char *line, int start, int end)
 {
 	char	*word;
 	int		i;
+	int		quote;
 
+	quote = 0;
+	if (start > 0)
+	{
+		if (line[start - 1] == '\'')
+			quote = 1;
+		else if	(line[start - 1] == '"')
+			quote = 2;
+	}
 	word = malloc(sizeof(char) * (end - start + 1));
 	if (!word)
 		return (NULL);
 	i = 0;
 	while (start < end)
 	{
-		word[i] = line[start];
-		i++;
+		if ((quote == 0) || ((line[start] != '\'' && quote == 1) || (line[start] != '"' && quote == 2)))
+			word[i++] = line[start];
 		start++;
 	}
 	word[i] = '\0';
