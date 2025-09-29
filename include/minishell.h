@@ -6,7 +6,7 @@
 /*   By: dedme <dedme@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/15 19:58:52 by mregnaut          #+#    #+#             */
-/*   Updated: 2025/09/24 19:44:26 by dedme            ###   ########.fr       */
+/*   Updated: 2025/09/29 01:26:09 by dedme            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,6 +70,8 @@ int		execute_with_redirections(t_cmd *cmd);
 int		execute_builtin_with_redirections(t_cmd *cmd, int builtin_index);
 int		execute_external_with_redirections(t_cmd *cmd);
 char	*find_executable_in_path(char *cmd);
+int		consume_heredocs(t_redir *redirections);
+int		handle_heredoc(char *delimiter, int count);
 
 
 /* EXECUTABLE */

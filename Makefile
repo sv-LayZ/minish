@@ -15,6 +15,7 @@ SRC = src/signals/signals.c \
 	src/execution/execution_external.c \
 	src/execution/execution_redirections.c \
 	src/execution/pipeline.c \
+	src/execution/consume_heredocs.c \
 	src/parsing/parsing.c \
 	src/parsing/lexer.c \
 	src/parsing/parser.c \
