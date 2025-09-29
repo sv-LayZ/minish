@@ -13,11 +13,11 @@
 #include "../include/minishell.h"
 #include "../include/parsing.h"
 
-int	handle_heredoc(char *delimiter, int count)
+int handle_heredoc(char *delimiter, int count, int expand)
 {
-    int					fd;
-    char				*line;
-    char				*tmpfile;
+    int     fd;
+    char    *line;
+    char    *tmpfile;
 
     signal(SIGINT, handle_signals_heredoc);
     signal(SIGQUIT, SIG_IGN);
@@ -27,10 +27,11 @@ int	handle_heredoc(char *delimiter, int count)
         perror("malloc malfunction");
         return (-1);
     }
-    fd = open(tmpfile, O_CREAT | O_WRONLY | O_TRUNC, 0644);
+    fd = open(tmpfile, O_CREAT | O_WRONLY | O_TRUNC, 0600);
     if (fd == -1)
     {
         perror("open heredoc");
+        free(tmpfile);
         return (-1);
     }
     while (1)
@@ -38,20 +39,38 @@ int	handle_heredoc(char *delimiter, int count)
         line = readline("> ");
         if (g_exit_status == 130)
         {
-            g_exit_status = 0;
+            // Do not reset g_exit_status here; propagate 130 upwards
             close(fd);
-			if (line)
-            	free(line);
+            if (line)
+                free(line);
             unlink(tmpfile);
-            return(-1);
+            free(tmpfile);
+            return (-1);
         }
         if (!line || ft_strcmp(line, delimiter) == 0)
         {
-			if (line)
-            	free(line);
-            break ;
+            if (line)
+                free(line);
+            break;
         }
-        ft_putendl_fd(line, fd);
+        if (expand && line)
+        {
+            char *expanded = expand_variables(line);
+            if (expanded)
+            {
+                ft_putendl_fd(expanded, fd);
+                free(expanded);
+            }
+            else
+            {
+                // On expansion failure, fallback to raw line
+                ft_putendl_fd(line, fd);
+            }
+        }
+        else
+        {
+            ft_putendl_fd(line, fd);
+        }
         free(line);
     }
     close(fd);
@@ -59,89 +78,91 @@ int	handle_heredoc(char *delimiter, int count)
     if (fd == -1)
     {
         perror("open heredoc read");
+        unlink(tmpfile);
+        free(tmpfile);
         return (-1);
     }
+    unlink(tmpfile);
     free(tmpfile);
     return (fd);
 }
 
-static int	apply_one_redir(t_redir *r, int count)
+static int  apply_one_redir(t_redir *r, int count)
 {
-	int	fd;
-	int	flags;	
+    int fd;
+    int flags;
 
-	if (r->type == TOKEN_REDIRECT_IN)
-	{
-		fd = open(r->file, O_RDONLY);
-		if (fd == -1)
-		{
-			perror(r->file);
-			return (-1);
-		}
-		if (dup2(fd, STDIN_FILENO) == -1)
-		{
-			perror("dup2");
-			close(fd);
-			return (-1);
-		}
-		close(fd);
-	}
-	else if (r->type == TOKEN_REDIRECT_OUT || r->type == TOKEN_REDIRECT_APPEND)
-	{
-		flags = O_WRONLY | O_CREAT;
-		if (r->type == TOKEN_REDIRECT_APPEND)
-			flags |= O_APPEND;
-		else
-			flags |= O_TRUNC;
-		fd = open(r->file, flags, 0644);
-		if (fd == -1)
-		{
-			perror(r->file);
-			return (-1);
-		}
-		if (dup2(fd, STDIN_FILENO) == -1)
-		{
-			perror("dup2");
-			close(fd);
-			return (-1);
-		}
-		close(fd);
-	}
-	else if (r->type == TOKEN_HEREDOC)
-	{
-		close_sig();
-		fd = handle_heredoc(r->file, count);
-		handle_signals();
-		if (fd == -1)
-		{
-			return (-1);
-		}
-		if (dup2(fd, STDIN_FILENO) == -1)
-		{
-			perror("dup2");
-			close(fd);
-			return (-1);
-		}
-		unlink(ft_strjoin("/tmp/heredoc_", ft_itoa(count)));
-		close(fd);
-	}
-	return (0);
+    if (r->type == TOKEN_REDIRECT_IN)
+    {
+        fd = open(r->file, O_RDONLY);
+        if (fd == -1)
+        {
+            perror(r->file);
+            return (-1);
+        }
+        if (dup2(fd, STDIN_FILENO) == -1)
+        {
+            perror("dup2");
+            close(fd);
+            return (-1);
+        }
+        close(fd);
+    }
+    else if (r->type == TOKEN_REDIRECT_OUT || r->type == TOKEN_REDIRECT_APPEND)
+    {
+        flags = O_WRONLY | O_CREAT;
+        if (r->type == TOKEN_REDIRECT_APPEND)
+            flags |= O_APPEND;
+        else
+            flags |= O_TRUNC;
+        fd = open(r->file, flags, 0644);
+        if (fd == -1)
+        {
+            perror(r->file);
+            return (-1);
+        }
+        if (dup2(fd, STDOUT_FILENO) == -1)
+        {
+            perror("dup2");
+            close(fd);
+            return (-1);
+        }
+        close(fd);
+    }
+    else if (r->type == TOKEN_HEREDOC)
+    {
+        close_sig();
+        fd = handle_heredoc(r->file, count, r->expand);
+        handle_signals();
+        if (fd == -1)
+        {
+            return (-1);
+        }
+        if (dup2(fd, STDIN_FILENO) == -1)
+        {
+            perror("dup2");
+            close(fd);
+            return (-1);
+        }
+        close(fd);
+    }
+    return (0);
 }
 
-int	apply_redirections(t_redir *redirections)
+int apply_redirections(t_redir *redirections)
 {
-	t_redir	*r;
-	int		count;
+    t_redir *r;
+    int     count;
 
-	r = redirections;
-	count = 0;
-	while (r)
-	{
-		if (apply_one_redir(r, count++) == -1)
-			return (-1);
-		r = r->next;
-	}
-	return (0);
+    r = redirections;
+    count = 0;
+    while (r)
+    {
+        if (apply_one_redir(r, count++) == -1)
+            return (-1);
+        r = r->next;
+    }
+    return (0);
 }
 
 static char	*search_in_paths(char **paths, char *cmd)

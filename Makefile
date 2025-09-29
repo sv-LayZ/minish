@@ -24,6 +24,7 @@ SRC = src/signals/signals.c \
 	src/parsing/redirection_utils.c \
 	src/parsing/parsing_utils.c \
 	src/parsing/debug.c \
+	src/parsing/expand_variables.c \
 	src/reader.c \
 	src/main.c \
 	src/builtins/builtin_utils.c \
@@ -61,19 +62,19 @@ $(LIBFT): force
 force:
 
 %.o: %.c $(HEADER) Makefile
-	$(CC) $(CFLAGS) -O3 -c $< -o $@
+	@mkdir -p $(dir $(OBJ_DIR)/$(@D))
+	$(CC) $(CFLAGS) -c $< -o $(OBJ_DIR)/$@
 
 $(OBJ_DIR)/%.o: src/%.c $(HEADER) Makefile
 	$(CC) $(CFLAGS) -O3 -c $< -o $@
 
 clean:
 	rm -rf $(OBJ_DIR)
-	$(MAKE) -C $(LIB_DIR) clean
+	$(MAKE) -C $(LIB_DIR) fclean
 
 fclean: clean
 	rm -f $(NAME)
-	$(MAKE) -C $(LIB_DIR) fclean
 
 re: fclean all
 
-.PHONY: all clean fclean re
+.PHONY: all clean fclean re force

@@ -31,8 +31,18 @@ static t_cmd	*parse_command(t_token **current)
 				free_commands(cmd);
 				return (NULL);
 			}
-			append_redirection(&cmd->redirections,
-				create_redirection(token->type, ft_strdup(token->next->value)));
+			// For heredoc, determine expansion based on the quote_type of the delimiter token
+			if (token->type == TOKEN_HEREDOC)
+			{
+				int expand = (token->next->quote_type == NO_QUOTE);
+				append_redirection(&cmd->redirections,
+					create_redirection(token->type, ft_strdup(token->next->value), expand));
+			}
+			else
+			{
+				append_redirection(&cmd->redirections,
+					create_redirection(token->type, ft_strdup(token->next->value), 0));
+			}
 			token = token->next->next;
 		}
 		else if (token->type == TOKEN_ARGUMENT || token->type == TOKEN_COMMAND)

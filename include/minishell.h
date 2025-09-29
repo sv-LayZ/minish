@@ -71,7 +71,7 @@ int		execute_builtin_with_redirections(t_cmd *cmd, int builtin_index);
 int		execute_external_with_redirections(t_cmd *cmd);
 char	*find_executable_in_path(char *cmd);
 int		consume_heredocs(t_redir *redirections);
-int		handle_heredoc(char *delimiter, int count);
+int		handle_heredoc(char *delimiter, int count, int expand);
 
 
 /* EXECUTABLE */

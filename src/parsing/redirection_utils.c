@@ -13,7 +13,7 @@
 #include "../../include/minishell.h"
 #include "../../include/parsing.h"
 
-t_redir	*create_redirection(t_token_type type, char *file)
+t_redir	*create_redirection(t_token_type type, char *file, int expand)
 {
 	t_redir	*redir;
 
@@ -24,6 +24,7 @@ t_redir	*create_redirection(t_token_type type, char *file)
 		return (NULL);
 	redir->type = type;
 	redir->file = file;
+	redir->expand = expand; /* only meaningful for TOKEN_HEREDOC */
 	redir->next = NULL;
 	return (redir);
 }
