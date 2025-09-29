@@ -6,7 +6,7 @@
 /*   By: dedme <dedme@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/01 00:00:00 by student           #+#    #+#             */
-/*   Updated: 2025/09/29 20:05:49 by dedme            ###   ########.fr       */
+/*   Updated: 2025/09/28 19:53:03 by dedme            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ int	handle_heredoc(char *delimiter, int count)
 			if (line)
             	free(line);
             unlink(tmpfile);
-            return (-1);
+            return(-1);
         }
         if (!line || ft_strcmp(line, delimiter) == 0)
         {
@@ -109,23 +109,12 @@ static int	apply_one_redir(t_redir *r, int count)
 	}
 	else if (r->type == TOKEN_HEREDOC)
 	{
-		/* If heredoc was pre-consumed (no command case or earlier pass), reuse it */
-		if (r->heredoc_done && r->heredoc_path)
+		close_sig();
+		fd = handle_heredoc(r->file, count);
+		handle_signals();
+		if (fd == -1)
 		{
-			fd = open(r->heredoc_path, O_RDONLY);
-			if (fd == -1)
-			{
-				perror("open heredoc");
-				return (-1);
-			}
-		}
-		else
-		{
-			close_sig();
-			fd = handle_heredoc(r->file, count);
-			handle_signals();
-			if (fd == -1)
-				return (-1);
+			return (-1);
 		}
 		if (dup2(fd, STDIN_FILENO) == -1)
 		{
@@ -133,19 +122,8 @@ static int	apply_one_redir(t_redir *r, int count)
 			close(fd);
 			return (-1);
 		}
+		unlink(ft_strjoin("/tmp/heredoc_", ft_itoa(count)));
 		close(fd);
-		/* Cleanup only if just created now (not keeping for later); if path stored, unlink after dup */
-		if (r->heredoc_done && r->heredoc_path)
-			unlink(r->heredoc_path);
-		else
-		{
-			char *tmp = ft_strjoin("/tmp/heredoc_", ft_itoa(count));
-			if (tmp)
-			{
-				unlink(tmp);
-				free(tmp);
-			}
-		}
 	}
 	return (0);
 }
