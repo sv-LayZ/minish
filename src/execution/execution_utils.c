@@ -43,7 +43,7 @@ int	handle_heredoc(char *delimiter, int count)
 			if (line)
             	free(line);
             unlink(tmpfile);
-            return(-1);
+            return (-1);
         }
         if (!line || ft_strcmp(line, delimiter) == 0)
         {
