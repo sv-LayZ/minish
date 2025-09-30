@@ -6,7 +6,7 @@
 /*   By: dedme <dedme@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/29 00:00:00 by ai-helper         #+#    #+#             */
-/*   Updated: 2025/09/29 01:26:09 by dedme            ###   ########.fr       */
+/*   Updated: 2025/10/01 01:16:57 by dedme            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,9 +32,7 @@ int	consume_heredocs(t_redir *redirections)
 	{
 		if (redirections->type == TOKEN_HEREDOC)
 		{
-			close_sig();
 			fd = handle_heredoc(redirections->file, count, redirections->expand);
-			handle_signals();
 			if (fd == -1)
 				return (1);
 			close(fd);
