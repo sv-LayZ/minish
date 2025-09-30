@@ -6,7 +6,7 @@
 /*   By: dedme <dedme@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/01 00:00:00 by student           #+#    #+#             */
-/*   Updated: 2025/09/30 22:12:21 by dedme            ###   ########.fr       */
+/*   Updated: 2025/09/30 22:47:49 by dedme            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,16 +43,6 @@ int handle_heredoc(char *delimiter, int count, int expand)
     while (1)
     {
         line = readline("> ");
-        if (g_exit_status == 130)
-        {
-            // Do not reset g_exit_status here; propagate 130 upwards
-            close(fd);
-            if (line)
-                free(line);
-            unlink(tmpfile);
-            free(tmpfile);
-            return (-1);
-        }
         if (!line || ft_strcmp(line, delimiter) == 0)
         {
             if (line)
