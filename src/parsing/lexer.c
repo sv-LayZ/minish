@@ -76,39 +76,30 @@ static t_token	*tokenize_line(const char *line)
 			i += op_len;
 			continue ;
 		}
-		// Word or quoted word
 		t_quote_type	start_quote = NO_QUOTE;
 		int				start;
 
 		if (line[i] == '\'')
 		{
 			start_quote = SINGLE_QUOTE;
-			i++; // skip opening quote
+			i++;
 		}
 		else if (line[i] == '"')
 		{
 			start_quote = DOUBLE_QUOTE;
-			i++; // skip opening quote
+			i++;
 		}
 		start = i;
 		if (start_quote != NO_QUOTE)
-		{
-			// Scan until matching closing quote
 			while (line[i] && !((start_quote == SINGLE_QUOTE && line[i] == '\'')
 					|| (start_quote == DOUBLE_QUOTE && line[i] == '"')))
 				i++;
-			// If we ended on a closing quote, do not include it
-			if (line[i] == '\'' || line[i] == '"')
-				;
-		}
 		else
 		{
 			while (line[i] && !ft_isspace(line[i]) && get_operator_length(line, i) == 0)
 				i++;
 		}
-		// Compute end (exclude closing quote if present)
 		int	end = i;
-		// If there was a closing quote, skip it now for next token
 		if (start_quote != NO_QUOTE && (line[i] == '\'' || line[i] == '"'))
 			i++;
 		if (end > start)

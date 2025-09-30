@@ -18,10 +18,18 @@ int handle_heredoc(char *delimiter, int count, int expand)
     int     fd;
     char    *line;
     char    *tmpfile;
+    char    *nstr;
 
     signal(SIGINT, handle_signals_heredoc);
     signal(SIGQUIT, SIG_IGN);
-    tmpfile = ft_strjoin("/tmp/heredoc_", ft_itoa(count));
+    nstr = ft_itoa(count);
+    if (!nstr)
+    {
+        perror("malloc malfunction");
+        return (-1);
+    }
+    tmpfile = ft_strjoin("/tmp/heredoc_", nstr);
+    free(nstr);
     if (!tmpfile)
     {
         perror("malloc malfunction");
