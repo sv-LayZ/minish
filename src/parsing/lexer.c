@@ -20,30 +20,6 @@ static int	skip_whitespace(const char *line, int i)
 	return (i);
 }
 
-static int	handle_quotes(const char *line, int i, t_quote_type *quote)
-{
-	if (line[i] == '\'' && *quote == NO_QUOTE)
-	{
-		*quote = SINGLE_QUOTE;
-		return (i + 1);
-	}
-	else if (line[i] == '\'' && *quote == SINGLE_QUOTE)
-	{
-		return (i + 1);
-	}
-	else if (line[i] == '"' && *quote == NO_QUOTE)
-	{
-		*quote = DOUBLE_QUOTE;
-		return (i + 1);
-	}
-	else if (line[i] == '"' && *quote == DOUBLE_QUOTE)
-	{
-		*quote = NO_QUOTE;
-		return (i+1);
-	}
-	return (i);
-}
-
 static int	get_operator_length(const char *line, int i)
 {
 	if (line[i] == '<' && line[i + 1] == '<')
@@ -55,31 +31,20 @@ static int	get_operator_length(const char *line, int i)
 	return (0);
 }
 
-/*si pas de quotes au debut de line quote = 0 si simple quote 1 si double quotes 2*/
+/* Extract a word without surrounding quotes. */
 static char	*extract_word(const char *line, int start, int end)
 {
 	char	*word;
 	int		i;
-	int		quote;
 
-	quote = 0;
-	if (start > 0)
-	{
-		if (line[start - 1] == '\'')
-			quote = 1;
-		else if	(line[start - 1] == '"')
-			quote = 2;
-	}
+	if (end < start)
+		return (NULL);
 	word = malloc(sizeof(char) * (end - start + 1));
 	if (!word)
 		return (NULL);
 	i = 0;
 	while (start < end)
-	{
-		if ((quote == 0) || ((line[start] != '\'' && quote == 1) || (line[start] != '"' && quote == 2)))
-			word[i++] = line[start];
-		start++;
-	}
+		word[i++] = line[start++];
 	word[i] = '\0';
 	return (word);
 }
@@ -87,23 +52,21 @@ static char	*extract_word(const char *line, int start, int end)
 static t_token	*tokenize_line(const char *line)
 {
 	t_token			*tokens;
-	t_quote_type	quote;
 	int				i;
-	int				start;
-	int				op_len;
-	char			*value;
 
 	tokens = NULL;
-	quote = NO_QUOTE;
 	i = 0;
 	while (line[i])
 	{
+		int				op_len;
+
 		i = skip_whitespace(line, i);
 		if (!line[i])
 			break ;
-		if (quote == NO_QUOTE && (op_len = get_operator_length(line, i)) > 0)
+		if ((op_len = get_operator_length(line, i)) > 0)
 		{
-			value = extract_word(line, i, i + op_len);
+			char	*value = extract_word(line, i, i + op_len);
+
 			if (value)
 			{
 				append_token(&tokens,
@@ -113,27 +76,48 @@ static t_token	*tokenize_line(const char *line)
 			i += op_len;
 			continue ;
 		}
-		start = i;
-		i = handle_quotes(line, i, &quote);
-		if (i != start)
-			continue ;
-		start = i;
-		while (line[i] && (quote != NO_QUOTE
-				|| (!ft_isspace(line[i]) && get_operator_length(line, i) == 0)))
+		// Word or quoted word
+		t_quote_type	start_quote = NO_QUOTE;
+		int				start;
+
+		if (line[i] == '\'')
 		{
-			i = handle_quotes(line, i, &quote);
-			if (line[i] && (quote != NO_QUOTE
-					|| (!ft_isspace(line[i])
-						&& get_operator_length(line, i) == 0)))
+			start_quote = SINGLE_QUOTE;
+			i++; // skip opening quote
+		}
+		else if (line[i] == '"')
+		{
+			start_quote = DOUBLE_QUOTE;
+			i++; // skip opening quote
+		}
+		start = i;
+		if (start_quote != NO_QUOTE)
+		{
+			// Scan until matching closing quote
+			while (line[i] && !((start_quote == SINGLE_QUOTE && line[i] == '\'')
+					|| (start_quote == DOUBLE_QUOTE && line[i] == '"')))
+				i++;
+			// If we ended on a closing quote, do not include it
+			if (line[i] == '\'' || line[i] == '"')
+				;
+		}
+		else
+		{
+			while (line[i] && !ft_isspace(line[i]) && get_operator_length(line, i) == 0)
 				i++;
 		}
-		if (i > start)
+		// Compute end (exclude closing quote if present)
+		int	end = i;
+		// If there was a closing quote, skip it now for next token
+		if (start_quote != NO_QUOTE && (line[i] == '\'' || line[i] == '"'))
+			i++;
+		if (end > start)
 		{
-			value = extract_word(line, start, i);
+			char	*value = extract_word(line, start, end);
+
 			if (value)
 			{
-				append_token(&tokens,
-					create_token(TOKEN_ARGUMENT, value, quote));
+				append_token(&tokens, create_token(TOKEN_ARGUMENT, value, start_quote));
 				free(value);
 			}
 		}

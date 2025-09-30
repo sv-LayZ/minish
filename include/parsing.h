@@ -54,6 +54,7 @@ typedef struct s_redir
 {
 	t_token_type		type;
 	char				*file;
+	int					expand; /* 1 if heredoc content should expand variables, 0 otherwise */
 	struct s_redir		*next;
 }	t_redir;
 
@@ -84,7 +85,7 @@ void		free_commands(t_cmd *head);
 int			add_argument(t_cmd *cmd, char *arg);
 
 /* REDIRECTION FUNCTIONS */
-t_redir		*create_redirection(t_token_type type, char *file);
+t_redir		*create_redirection(t_token_type type, char *file, int expand);
 void		append_redirection(t_redir **head, t_redir *new_redir);
 void		free_redirections(t_redir *head);
 

@@ -26,7 +26,6 @@ int	consume_heredocs(t_redir *redirections)
 {
 	int		count;
 	int		fd;
-	char	*tmp_name;
 
 	count = 0;
 	while (redirections)
@@ -34,18 +33,11 @@ int	consume_heredocs(t_redir *redirections)
 		if (redirections->type == TOKEN_HEREDOC)
 		{
 			close_sig();
-			fd = handle_heredoc(redirections->file, count);
+			fd = handle_heredoc(redirections->file, count, redirections->expand);
 			handle_signals();
 			if (fd == -1)
 				return (1);
 			close(fd);
-			/* remove temp file */
-			tmp_name = ft_strjoin("/tmp/heredoc_", ft_itoa(count));
-			if (tmp_name)
-			{
-				unlink(tmp_name);
-				free(tmp_name);
-			}
 			count++;
 		}
 		redirections = redirections->next;
