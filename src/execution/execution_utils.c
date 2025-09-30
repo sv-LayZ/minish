@@ -6,7 +6,7 @@
 /*   By: dedme <dedme@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/01 00:00:00 by student           #+#    #+#             */
-/*   Updated: 2025/09/28 19:53:03 by dedme            ###   ########.fr       */
+/*   Updated: 2025/09/30 22:12:21 by dedme            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,8 +20,6 @@ int handle_heredoc(char *delimiter, int count, int expand)
     char    *tmpfile;
     char    *nstr;
 
-    signal(SIGINT, handle_signals_heredoc);
-    signal(SIGQUIT, SIG_IGN);
     nstr = ft_itoa(count);
     if (!nstr)
     {
@@ -141,7 +139,6 @@ static int  apply_one_redir(t_redir *r, int count)
     {
         close_sig();
         fd = handle_heredoc(r->file, count, r->expand);
-        handle_signals();
         if (fd == -1)
         {
             return (-1);
