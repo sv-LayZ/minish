@@ -61,7 +61,7 @@ static void	add_word_token(const char *line, int s, int e,
 {
 	char	*value;
 
-	if (e > s)
+	if (e > s || q != NO_QUOTE)
 	{
 		value = extract_word(line, s, e);
 		if (value)

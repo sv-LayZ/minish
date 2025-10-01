@@ -47,7 +47,15 @@ static void	process_line(char *line)
 		if ((!cmds->args || !cmds->args[0]) && cmds->redirections)
 			handle_only_heredoc(cmds);
 		else if (cmds->args && cmds->args[0])
-			g_exit_status = execute_pipeline(cmds);
+		{
+			if (ft_strlen(cmds->args[0]) == 0)
+			{
+				ft_putstr_fd("minishell: : command not found\n", 2);
+				g_exit_status = 127;
+			}
+			else
+				g_exit_status = execute_pipeline(cmds);
+		}
 	}
 	free_commands(cmds);
 }
@@ -69,5 +77,5 @@ int	main(int ac, char **av)
 		process_line(line);
 		free(line);
 	}
-	return (0);
+	return (g_exit_status);
 }

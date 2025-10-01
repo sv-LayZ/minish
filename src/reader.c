@@ -11,15 +11,21 @@
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
+#include <unistd.h>
 
 char	*reader(void)
 {
 	char	*line;
+	char	*prompt;
 
-	line = readline("minishell$ ");
+	prompt = NULL;
+	if (isatty(STDIN_FILENO))
+		prompt = "minishell$ ";
+	line = readline(prompt);
 	if (!line)
 	{
-		printf("exit\n");
+		if (isatty(STDIN_FILENO))
+			printf("exit\n");
 		exit(g_exit_status);
 	}
 	return (line);
