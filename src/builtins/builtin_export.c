@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtin_export.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mregnaut <mregnaut@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: dedme <dedme@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/23 21:35:47 by mregnaut          #+#    #+#             */
-/*   Updated: 2025/09/15 19:56:27 by mregnaut         ###   ########.fr       */
+/*   Updated: 2025/10/02 00:07:25 by dedme            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,30 +66,36 @@ static int	set_var_with_value(char *arg, char *equal_pos)
 	return (0);
 }
 
-static int	set_env_var(char *arg)
+static int	print_export_error(char *arg)
 {
-	char	*equal_pos;
-	int		i;
+	ft_putstr_fd("minishell: export: `", 2);
+	ft_putstr_fd(arg, 2);
+	ft_putstr_fd("': not a valid identifier\n", 2);
+	return (1);
+}
+
+static int	is_valid_identifier(char *arg)
+{
+	int	i;
 
 	if (!arg || !*arg || (!ft_isalpha(arg[0]) && arg[0] != '_'))
-	{
-		ft_putstr_fd("minishell: export: `", 2);
-		ft_putstr_fd(arg, 2);
-		ft_putstr_fd("': not a valid identifier\n", 2);
-		return (1);
-	}
+		return (0);
 	i = 1;
 	while (arg[i] && arg[i] != '=')
 	{
 		if (!ft_isalnum(arg[i]) && arg[i] != '_')
-		{
-			ft_putstr_fd("minishell: export: `", 2);
-			ft_putstr_fd(arg, 2);
-			ft_putstr_fd("': not a valid identifier\n", 2);
-			return (1);
-		}
+			return (0);
 		i++;
 	}
+	return (1);
+}
+
+static int	set_env_var(char *arg)
+{
+	char	*equal_pos;
+
+	if (!is_valid_identifier(arg))
+		return (print_export_error(arg));
 	equal_pos = ft_strchr(arg, '=');
 	if (!equal_pos)
 		return (set_var_without_value(arg));
