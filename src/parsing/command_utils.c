@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   command_utils.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mregnaut <mregnaut@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: dedme <dedme@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/15 20:09:00 by mregnaut          #+#    #+#             */
-/*   Updated: 2025/09/15 23:06:51 by mregnaut         ###   ########.fr       */
+/*   Updated: 2025/10/01 15:45:20 by dedme            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,33 +27,46 @@ t_cmd	*create_command(void)
 	return (cmd);
 }
 
+static int	count_args(char **args)
+{
+	int	i;
+
+	i = 0;
+	while (args && args[i])
+		i++;
+	return (i);
+}
+
+static void	copy_args(char **dest, char **src, int argc)
+{
+	int	i;
+
+	i = 0;
+	while (i < argc)
+	{
+		dest[i] = src[i];
+		i++;
+	}
+}
+
 int	add_argument(t_cmd *cmd, char *arg)
 {
 	char	**new_args;
 	int		argc;
-	int		i;
 
 	if (!cmd || !arg)
 		return (0);
-	argc = 0;
-	if (cmd->args)
-		while (cmd->args[argc])
-			argc++;
+	argc = count_args(cmd->args);
 	new_args = malloc(sizeof(char *) * (argc + 2));
 	if (!new_args)
 		return (0);
-	i = 0;
 	if (cmd->args)
 	{
-		while (i < argc)
-		{
-			new_args[i] = cmd->args[i];
-			i++;
-		}
+		copy_args(new_args, cmd->args, argc);
 		free(cmd->args);
 	}
-	new_args[i] = ft_strdup(arg);
-	new_args[i + 1] = NULL;
+	new_args[argc] = ft_strdup(arg);
+	new_args[argc + 1] = NULL;
 	cmd->args = new_args;
 	return (1);
 }

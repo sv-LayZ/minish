@@ -6,30 +6,12 @@
 /*   By: dedme <dedme@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/15 20:06:00 by mregnaut          #+#    #+#             */
-/*   Updated: 2025/10/01 04:55:09 by dedme            ###   ########.fr       */
+/*   Updated: 2025/10/01 16:49:49 by dedme            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 #include "../../include/parsing.h"
-
-static int	skip_whitespace(const char *line, int i)
-{
-	while (line[i] && (line[i] == ' ' || line[i] == '\t'))
-		i++;
-	return (i);
-}
-
-static int	get_operator_length(const char *line, int i)
-{
-	if (line[i] == '<' && line[i + 1] == '<')
-		return (2);
-	if (line[i] == '>' && line[i + 1] == '>')
-		return (2);
-	if (line[i] == '|' || line[i] == '<' || line[i] == '>')
-		return (1);
-	return (0);
-}
 
 /* Extract a word without surrounding quotes. */
 static char	*extract_word(const char *line, int start, int end)
@@ -60,8 +42,8 @@ static void	handle_operator(const char *line, int *i, t_token **tokens)
 		value = extract_word(line, *i, *i + op_len);
 		if (value)
 		{
-			append_token(tokens, create_token(get_token_type(value),
-					value, NO_QUOTE));
+			append_token(tokens, create_token(get_token_type(value), value,
+					NO_QUOTE));
 			free(value);
 		}
 		*i += op_len;
@@ -75,23 +57,27 @@ static void	handle_word_or_quote(const char *line, int *i, t_token **tokens)
 	t_quote_type	start_quote;
 	char			*value;
 
-	start_quote = (line[*i] == '\'') ? SINGLE_QUOTE :
-		(line[*i] == '"') ? DOUBLE_QUOTE : NO_QUOTE;
+	start_quote = (line[*i] == '\'') ? SINGLE_QUOTE : (line[*i] == '"') ? DOUBLE_QUOTE : NO_QUOTE;
 	if (start_quote != NO_QUOTE)
 		(*i)++;
 	start = *i;
 	while (line[*i] && ((start_quote == NO_QUOTE && !ft_isspace(line[*i])
-			&& !get_operator_length(line, *i)) ||
-			(start_quote == SINGLE_QUOTE && line[*i] != '\'') ||
-			(start_quote == DOUBLE_QUOTE && line[*i] != '"')))
+				&& !get_operator_length(line, *i))
+			|| (start_quote == SINGLE_QUOTE && line[*i] != '\'')
+				|| (start_quote == DOUBLE_QUOTE && line[*i] != '"')))
 		(*i)++;
 	end = *i;
 	if (start_quote != NO_QUOTE && (line[*i] == '\'' || line[*i] == '"'))
 		(*i)++;
-	if (end > start && (value = extract_word(line, start, end)))
+	if (end > start)
 	{
-		append_token(tokens, create_token(TOKEN_ARGUMENT, value, start_quote));
-		free(value);
+		value = extract_word(line, start, end);
+		if (value)
+		{
+			append_token(tokens, create_token(TOKEN_ARGUMENT, value,
+					start_quote));
+			free(value);
+		}
 	}
 }
 
@@ -113,7 +99,7 @@ static t_token	*tokenize_line(const char *line)
 			handle_word_or_quote(line, &i, &tokens);
 	}
 	return (tokens);
-} 
+}
 
 t_token	*lexer(const char *line)
 {

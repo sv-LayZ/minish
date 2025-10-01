@@ -34,7 +34,8 @@ SRC = src/signals/signals.c \
 	src/builtins/builtin_export.c \
 	src/builtins/builtin_unset.c \
 	src/builtins/builtin_env.c \
-	src/builtins/builtin_exit.c
+	src/builtins/builtin_exit.c \
+	src/parsing/lexer_utils.c
 	
 HEADER = include/minishell.h
 
