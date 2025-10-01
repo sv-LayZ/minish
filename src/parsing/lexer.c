@@ -53,8 +53,6 @@ static int	scan_word(const char *line, int *i, t_quote_type q)
 			|| (q == SINGLE_QUOTE && line[*i] != '\'')
 			|| (q == DOUBLE_QUOTE && line[*i] != '"')))
 		(*i)++;
-	if (q != NO_QUOTE && (line[*i] == '\'' || line[*i] == '"'))
-		(*i)++;
 	return (start);
 }
 
@@ -83,6 +81,11 @@ static void	handle_word_or_quote(const char *line, int *i, t_token **tokens)
 	start_quote = get_start_quote(line, i);
 	start = scan_word(line, i, start_quote);
 	end = *i;
+
+	// Skip closing quote if present
+	if (start_quote != NO_QUOTE && (line[*i] == '\'' || line[*i] == '"'))
+		(*i)++;
+
 	add_word_token(line, start, end, start_quote, tokens);
 }
 
