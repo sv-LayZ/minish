@@ -87,11 +87,12 @@ asan: re
 # Valgrind interactive session
 debug: CFLAGS += -g3
 debug: re
-	valgrind --leak-check=full\
-		--track-origins=yes\
-		--show-leak-kinds=all\
+	valgrind --leak-check=full \
+		--track-origins=yes \
+		--show-leak-kinds=all \
 		--trace-children=yes \
 		--suppressions=readline.supp \
+		-s \
 		./$(NAME)
 
 # Batch leak checks

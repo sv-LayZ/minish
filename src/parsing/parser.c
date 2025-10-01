@@ -40,16 +40,40 @@ static t_cmd	*parse_command(t_token **current)
 			}
 			else
 			{
+				char *filename;
+
+				// Expand variables in filename unless it's single-quoted
+				if (token->next->quote_type == SINGLE_QUOTE)
+					filename = ft_strdup(token->next->value);
+				else
+				{
+					filename = expand_variables(token->next->value);
+					if (!filename)
+						filename = ft_strdup(token->next->value);
+				}
 				append_redirection(&cmd->redirections,
-					create_redirection(token->type, ft_strdup(token->next->value), 0));
+					create_redirection(token->type, filename, 0));
 			}
 			token = token->next->next;
 		}
 		else if (token->type == TOKEN_ARGUMENT || token->type == TOKEN_COMMAND)
 		{
+			char *arg_value;
+
+			// Expand variables unless it's a single-quoted string
+			if (token->quote_type == SINGLE_QUOTE)
+				arg_value = ft_strdup(token->value);
+			else
+			{
+				arg_value = expand_variables(token->value);
+				if (!arg_value)
+					arg_value = ft_strdup(token->value);
+			}
+
 			if (!cmd->name)
-				cmd->name = ft_strdup(token->value);
-			add_argument(cmd, token->value);
+				cmd->name = ft_strdup(arg_value);
+			add_argument(cmd, arg_value);
+			free(arg_value);
 			token = token->next;
 		}
 		else
