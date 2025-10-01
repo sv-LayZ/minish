@@ -6,7 +6,7 @@
 /*   By: dedme <dedme@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/15 20:06:00 by mregnaut          #+#    #+#             */
-/*   Updated: 2025/10/01 16:49:49 by dedme            ###   ########.fr       */
+/*   Updated: 2025/10/01 18:54:07 by dedme            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,22 +14,6 @@
 #include "../../include/parsing.h"
 
 /* Extract a word without surrounding quotes. */
-static char	*extract_word(const char *line, int start, int end)
-{
-	char	*word;
-	int		i;
-
-	if (end < start)
-		return (NULL);
-	word = malloc(sizeof(char) * (end - start + 1));
-	if (!word)
-		return (NULL);
-	i = 0;
-	while (start < end)
-		word[i++] = line[start++];
-	word[i] = '\0';
-	return (word);
-}
 
 static void	handle_operator(const char *line, int *i, t_token **tokens)
 {
@@ -50,36 +34,58 @@ static void	handle_operator(const char *line, int *i, t_token **tokens)
 	}
 }
 
+static t_quote_type	get_start_quote(const char *line, int *i)
+{
+	if (line[*i] == '\'')
+		return ((*i)++, SINGLE_QUOTE);
+	if (line[*i] == '"')
+		return ((*i)++, DOUBLE_QUOTE);
+	return (NO_QUOTE);
+}
+
+static int	scan_word(const char *line, int *i, t_quote_type q)
+{
+	int	start;
+
+	start = *i;
+	while (line[*i] && ((q == NO_QUOTE && !ft_isspace(line[*i])
+				&& !get_operator_length(line, *i))
+			|| (q == SINGLE_QUOTE && line[*i] != '\'')
+			|| (q == DOUBLE_QUOTE && line[*i] != '"')))
+		(*i)++;
+	if (q != NO_QUOTE && (line[*i] == '\'' || line[*i] == '"'))
+		(*i)++;
+	return (start);
+}
+
+static void	add_word_token(const char *line, int s, int e,
+		t_quote_type q, t_token **tokens)
+{
+	char	*value;
+
+	if (e > s)
+	{
+		value = extract_word(line, s, e);
+		if (value)
+		{
+			append_token(tokens, create_token(TOKEN_ARGUMENT, value, q));
+			free(value);
+		}
+	}
+}
+
 static void	handle_word_or_quote(const char *line, int *i, t_token **tokens)
 {
 	int				start;
 	int				end;
 	t_quote_type	start_quote;
-	char			*value;
 
-	start_quote = (line[*i] == '\'') ? SINGLE_QUOTE : (line[*i] == '"') ? DOUBLE_QUOTE : NO_QUOTE;
-	if (start_quote != NO_QUOTE)
-		(*i)++;
-	start = *i;
-	while (line[*i] && ((start_quote == NO_QUOTE && !ft_isspace(line[*i])
-				&& !get_operator_length(line, *i))
-			|| (start_quote == SINGLE_QUOTE && line[*i] != '\'')
-				|| (start_quote == DOUBLE_QUOTE && line[*i] != '"')))
-		(*i)++;
+	start_quote = get_start_quote(line, i);
+	start = scan_word(line, i, start_quote);
 	end = *i;
-	if (start_quote != NO_QUOTE && (line[*i] == '\'' || line[*i] == '"'))
-		(*i)++;
-	if (end > start)
-	{
-		value = extract_word(line, start, end);
-		if (value)
-		{
-			append_token(tokens, create_token(TOKEN_ARGUMENT, value,
-					start_quote));
-			free(value);
-		}
-	}
+	add_word_token(line, start, end, start_quote, tokens);
 }
+
 
 static t_token	*tokenize_line(const char *line)
 {

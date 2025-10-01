@@ -6,7 +6,7 @@
 /*   By: dedme <dedme@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/15 19:58:58 by mregnaut          #+#    #+#             */
-/*   Updated: 2025/10/01 16:13:40 by dedme            ###   ########.fr       */
+/*   Updated: 2025/10/01 18:55:27 by dedme            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,6 +73,7 @@ t_cmd		*parser(t_token *tokens);
 t_cmd		*parsing(char *line);
 int			get_operator_length(const char *line, int i);
 int			skip_whitespace(const char *line, int i);
+char		*extract_word(const char *line, int start, int end);
 
 /* TOKEN FUNCTIONS */
 t_token		*create_token(t_token_type t, const char *v, t_quote_type q);
