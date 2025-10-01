@@ -91,7 +91,7 @@ static int	execute_piped_command(t_cmd *cmd, int pipes[][2],
 		builtin_index = is_builtin(cmd->args[0]);
 		if (builtin_index != -1)
 		{
-			builtin_index = execute_builtin(builtin_index, cmd->args);
+			builtin_index = execute_builtin(builtin_index, cmd->args, cmds_head);
 			free_commands(cmds_head);
 			exit(builtin_index);
 		}

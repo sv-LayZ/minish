@@ -28,8 +28,8 @@
 # include <sys/types.h>
 # include <sys/wait.h>
 # include "../libft/libft.h"
-# include "builtin.h"
 # include "parsing.h"
+# include "builtin.h"
 
 # define ENV_SEPARATOR ':'
 # define ENV_PATH "PATH"
@@ -63,8 +63,6 @@ int		execute_pipeline(t_cmd *cmd);
 int		setup_input_redirection(t_cmd *cmd);
 int		setup_output_redirection(t_cmd *cmd);
 int		apply_redirections(t_redir *redirections);
-int		is_builtin(char *cmd);
-int		execute_builtin(int builtin_index, char **args);
 int		execute_external_command(char **args);
 int		execute_with_redirections(t_cmd *cmd);
 int		execute_builtin_with_redirections(t_cmd *cmd, int builtin_index);

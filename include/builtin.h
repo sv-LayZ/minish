@@ -16,7 +16,7 @@
 # include "minishell.h"
 
 # define BUILTIN_CMDS "echo", "cd", "pwd", "export", "unset", "env", "exit", NULL
-# define BUILTIN_FUNCS builtin_echo, builtin_cd, builtin_pwd, builtin_export, builtin_unset, builtin_env, builtin_exit, NULL
+# define BUILTIN_FUNCS builtin_echo, builtin_cd, builtin_pwd, builtin_export, builtin_unset, builtin_env, NULL, NULL
 
 /* Builtin function declarations */
 int	builtin_echo(char **args);
@@ -25,10 +25,10 @@ int	builtin_pwd(char **args);
 int	builtin_export(char **args);
 int	builtin_unset(char **args);
 int	builtin_env(char **args);
-int	builtin_exit(char **args);
+int	builtin_exit(char **args, t_cmd *cmds_head);
 
 /* Utility functions */
 int	is_builtin(char *cmd);
-int	execute_builtin(int index, char **args);
+int	execute_builtin(int index, char **args, t_cmd *cmds_head);
 
 #endif

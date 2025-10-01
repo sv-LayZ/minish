@@ -37,7 +37,7 @@ int	execute_builtin_with_redirections(t_cmd *cmd, int builtin_index)
 				exit(1);
 			}
 		}
-		exit_code = execute_builtin(builtin_index, cmd->args);
+		exit_code = execute_builtin(builtin_index, cmd->args, cmd);
 		free_commands(cmd);
 		exit(exit_code);
 	}
