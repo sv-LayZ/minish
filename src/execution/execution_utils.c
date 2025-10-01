@@ -6,35 +6,26 @@
 /*   By: dedme <dedme@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/01 00:00:00 by student           #+#    #+#             */
-/*   Updated: 2025/10/01 15:35:13 by dedme            ###   ########.fr       */
+/*   Updated: 2025/10/02 01:50:41 by dedme            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 #include "../include/parsing.h"
 
-static char	*create_tmpfile(int count)
-{
-	char	*nstr;
-	char	*tmpfile;
-
-	nstr = ft_itoa(count);
-	if (!nstr)
-		return (NULL);
-	tmpfile = ft_strjoin("/tmp/heredoc_", nstr);
-	free(nstr);
-	return (tmpfile);
-}
-
 static void	write_heredoc_lines(int fd, char *delimiter, int expand)
 {
 	char	*line;
 	char	*expanded;
 
-	while ((line = readline("> ")))
+	line = readline("> ");
+	while (line)
 	{
 		if (ft_strcmp(line, delimiter) == 0)
-			return (free(line));
+		{
+			free(line);
+			return ;
+		}
 		if (expand)
 		{
 			expanded = expand_variables(line);
@@ -47,6 +38,7 @@ static void	write_heredoc_lines(int fd, char *delimiter, int expand)
 		else
 			ft_putendl_fd(line, fd);
 		free(line);
+		line = readline("> ");
 	}
 }
 
@@ -55,7 +47,8 @@ int	handle_heredoc(char *delimiter, int count, int expand)
 	int		fd;
 	char	*tmpfile;
 
-	if (!(tmpfile = create_tmpfile(count)))
+	tmpfile = create_tmpfile(count);
+	if (!tmpfile)
 		return (perror("malloc malfunction"), -1);
 	fd = open(tmpfile, O_CREAT | O_WRONLY | O_TRUNC, 0600);
 	if (fd == -1)
@@ -64,7 +57,8 @@ int	handle_heredoc(char *delimiter, int count, int expand)
 	close(fd);
 	fd = open(tmpfile, O_RDONLY);
 	if (fd == -1)
-		return (perror("open heredoc read"), unlink(tmpfile), free(tmpfile), -1);
+		return (perror("open heredoc read"),
+			unlink(tmpfile), free(tmpfile), -1);
 	unlink(tmpfile);
 	return (free(tmpfile), fd);
 }
@@ -72,53 +66,17 @@ int	handle_heredoc(char *delimiter, int count, int expand)
 static int	apply_one_redir(t_redir *r, int count)
 {
 	int	fd;
-	int	flags;
 
 	if (r->type == TOKEN_REDIRECT_IN)
-	{
-		fd = open(r->file, O_RDONLY);
-		if (fd == -1)
-		{
-			perror(r->file);
-			return (-1);
-		}
-		if (dup2(fd, STDIN_FILENO) == -1)
-		{
-			perror("dup2");
-			close(fd);
-			return (-1);
-		}
-		close(fd);
-	}
-	else if (r->type == TOKEN_REDIRECT_OUT || r->type == TOKEN_REDIRECT_APPEND)
-	{
-		flags = O_WRONLY | O_CREAT;
-		if (r->type == TOKEN_REDIRECT_APPEND)
-			flags |= O_APPEND;
-		else
-			flags |= O_TRUNC;
-		fd = open(r->file, flags, 0644);
-		if (fd == -1)
-		{
-			perror(r->file);
-			return (-1);
-		}
-		if (dup2(fd, STDOUT_FILENO) == -1)
-		{
-			perror("dup2");
-			close(fd);
-			return (-1);
-		}
-		close(fd);
-	}
-	else if (r->type == TOKEN_HEREDOC)
+		return (redir_in(r->file));
+	if (r->type == TOKEN_REDIRECT_OUT || r->type == TOKEN_REDIRECT_APPEND)
+		return (redir_out(r->file, r->type));
+	if (r->type == TOKEN_HEREDOC)
 	{
 		close_sig();
 		fd = handle_heredoc(r->file, count, r->expand);
 		if (fd == -1)
-		{
 			return (-1);
-		}
 		if (dup2(fd, STDIN_FILENO) == -1)
 		{
 			perror("dup2");
@@ -146,43 +104,6 @@ int	apply_redirections(t_redir *redirections)
 	return (0);
 }
 
-static char	*search_in_paths(char **paths, char *cmd)
-{
-	char	*full_path;
-	char	*temp;
-	int		i;
-
-	i = 0;
-	while (paths[i])
-	{
-		temp = ft_strjoin(paths[i], "/");
-		if (!temp)
-			break ;
-		full_path = ft_strjoin(temp, cmd);
-		free(temp);
-		if (full_path && access(full_path, X_OK) == 0)
-			return (full_path);
-		free(full_path);
-		i++;
-	}
-	return (NULL);
-}
-
-static void	free_string_array(char **array)
-{
-	int	i;
-
-	if (!array)
-		return ;
-	i = 0;
-	while (array[i])
-	{
-		free(array[i]);
-		i++;
-	}
-	free(array);
-}
-
 char	*find_executable_in_path(char *cmd)
 {
 	char	**paths;
@@ -200,20 +121,4 @@ char	*find_executable_in_path(char *cmd)
 	result = search_in_paths(paths, cmd);
 	free_string_array(paths);
 	return (result);
-}
-
-int	setup_input_redirection(t_cmd *cmd)
-{
-	// This function is now handled by apply_redirections
-	// Keep for compatibility but it's no longer used with new structure
-	(void)cmd;
-	return (0);
-}
-
-int	setup_output_redirection(t_cmd *cmd)
-{
-	// This function is now handled by apply_redirections
-	// Keep for compatibility but it's no longer used with new structure
-	(void)cmd;
-	return (0);
 }
