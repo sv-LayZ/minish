@@ -13,6 +13,9 @@
 #include "../include/minishell.h"
 #include "../include/parsing.h"
 
+/*
+ * Execute une seule commande (SANS PIPE !).
+*/
 int	execute_command(t_cmd *cmd)
 {
 	int	builtin_index;
