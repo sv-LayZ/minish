@@ -6,7 +6,7 @@
 /*   By: dedme <dedme@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/15 20:06:00 by mregnaut          #+#    #+#             */
-/*   Updated: 2025/09/22 18:12:12 by dedme            ###   ########.fr       */
+/*   Updated: 2025/10/01 04:55:09 by dedme            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,72 +49,71 @@ static char	*extract_word(const char *line, int start, int end)
 	return (word);
 }
 
+static void	handle_operator(const char *line, int *i, t_token **tokens)
+{
+	int		op_len;
+	char	*value;
+
+	op_len = get_operator_length(line, *i);
+	if (op_len > 0)
+	{
+		value = extract_word(line, *i, *i + op_len);
+		if (value)
+		{
+			append_token(tokens, create_token(get_token_type(value),
+					value, NO_QUOTE));
+			free(value);
+		}
+		*i += op_len;
+	}
+}
+
+static void	handle_word_or_quote(const char *line, int *i, t_token **tokens)
+{
+	int				start;
+	int				end;
+	t_quote_type	start_quote;
+	char			*value;
+
+	start_quote = (line[*i] == '\'') ? SINGLE_QUOTE :
+		(line[*i] == '"') ? DOUBLE_QUOTE : NO_QUOTE;
+	if (start_quote != NO_QUOTE)
+		(*i)++;
+	start = *i;
+	while (line[*i] && ((start_quote == NO_QUOTE && !ft_isspace(line[*i])
+			&& !get_operator_length(line, *i)) ||
+			(start_quote == SINGLE_QUOTE && line[*i] != '\'') ||
+			(start_quote == DOUBLE_QUOTE && line[*i] != '"')))
+		(*i)++;
+	end = *i;
+	if (start_quote != NO_QUOTE && (line[*i] == '\'' || line[*i] == '"'))
+		(*i)++;
+	if (end > start && (value = extract_word(line, start, end)))
+	{
+		append_token(tokens, create_token(TOKEN_ARGUMENT, value, start_quote));
+		free(value);
+	}
+}
+
 static t_token	*tokenize_line(const char *line)
 {
-	t_token			*tokens;
-	int				i;
+	t_token	*tokens;
+	int		i;
 
 	tokens = NULL;
 	i = 0;
 	while (line[i])
 	{
-		int				op_len;
-
 		i = skip_whitespace(line, i);
 		if (!line[i])
 			break ;
-		if ((op_len = get_operator_length(line, i)) > 0)
-		{
-			char	*value = extract_word(line, i, i + op_len);
-
-			if (value)
-			{
-				append_token(&tokens,
-					create_token(get_token_type(value), value, NO_QUOTE));
-				free(value);
-			}
-			i += op_len;
-			continue ;
-		}
-		t_quote_type	start_quote = NO_QUOTE;
-		int				start;
-
-		if (line[i] == '\'')
-		{
-			start_quote = SINGLE_QUOTE;
-			i++;
-		}
-		else if (line[i] == '"')
-		{
-			start_quote = DOUBLE_QUOTE;
-			i++;
-		}
-		start = i;
-		if (start_quote != NO_QUOTE)
-			while (line[i] && !((start_quote == SINGLE_QUOTE && line[i] == '\'')
-					|| (start_quote == DOUBLE_QUOTE && line[i] == '"')))
-				i++;
+		if (get_operator_length(line, i) > 0)
+			handle_operator(line, &i, &tokens);
 		else
-		{
-			while (line[i] && !ft_isspace(line[i]) && get_operator_length(line, i) == 0)
-				i++;
-		}
-		int	end = i;
-		if (start_quote != NO_QUOTE && (line[i] == '\'' || line[i] == '"'))
-			i++;
-		if (end > start)
-		{
-			char	*value = extract_word(line, start, end);
-
-			if (value)
-			{
-				append_token(&tokens, create_token(TOKEN_ARGUMENT, value, start_quote));
-				free(value);
-			}
-		}
+			handle_word_or_quote(line, &i, &tokens);
 	}
 	return (tokens);
-}
+} 
 
 t_token	*lexer(const char *line)
 {
