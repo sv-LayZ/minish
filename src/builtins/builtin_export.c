@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtin_export.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mregnaut <mregnaut@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: dedme <dedme@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/23 21:35:47 by mregnaut          #+#    #+#             */
-/*   Updated: 2025/09/15 19:56:27 by mregnaut         ###   ########.fr       */
+/*   Updated: 2025/10/02 01:02:48 by dedme            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ static void	print_exported_vars(void)
 }
 /* l48-Just declaring a variable without value */
 
-static int	set_var_without_value(char *arg)
+int	set_var_without_value(char *arg)
 {
 	if (setenv(arg, "", 1) != 0)
 	{
@@ -47,7 +47,7 @@ static int	set_var_without_value(char *arg)
 	return (0);
 }
 
-static int	set_var_with_value(char *arg, char *equal_pos)
+int	set_var_with_value(char *arg, char *equal_pos)
 {
 	char	*key;
 	char	*value;
@@ -66,34 +66,12 @@ static int	set_var_with_value(char *arg, char *equal_pos)
 	return (0);
 }
 
-static int	set_env_var(char *arg)
+int	print_export_error(char *arg)
 {
-	char	*equal_pos;
-	int		i;
-
-	if (!arg || !*arg || (!ft_isalpha(arg[0]) && arg[0] != '_'))
-	{
-		ft_putstr_fd("minishell: export: `", 2);
-		ft_putstr_fd(arg, 2);
-		ft_putstr_fd("': not a valid identifier\n", 2);
-		return (1);
-	}
-	i = 1;
-	while (arg[i] && arg[i] != '=')
-	{
-		if (!ft_isalnum(arg[i]) && arg[i] != '_')
-		{
-			ft_putstr_fd("minishell: export: `", 2);
-			ft_putstr_fd(arg, 2);
-			ft_putstr_fd("': not a valid identifier\n", 2);
-			return (1);
-		}
-		i++;
-	}
-	equal_pos = ft_strchr(arg, '=');
-	if (!equal_pos)
-		return (set_var_without_value(arg));
-	return (set_var_with_value(arg, equal_pos));
+	ft_putstr_fd("minishell: export: `", 2);
+	ft_putstr_fd(arg, 2);
+	ft_putstr_fd("': not a valid identifier\n", 2);
+	return (1);
 }
 
 int	builtin_export(char **args)

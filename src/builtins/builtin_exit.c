@@ -30,17 +30,21 @@ static int	is_number(char *str)
 	return (1);
 }
 
-int	builtin_exit(char **args)
+int	builtin_exit(char **args, t_cmd *cmds_head)
 {
 	int	exit_code;
 
 	printf("exit\n");
 	if (!args[1])
+	{
+		free_commands(cmds_head);
 		exit(0);
+	}
 	if (!is_number(args[1]))
 	{
 		fprintf(stderr, "minishell: exit: %s: numeric argument required\n",
 			args[1]);
+		free_commands(cmds_head);
 		exit(2);
 	}
 	if (args[2])
@@ -49,5 +53,6 @@ int	builtin_exit(char **args)
 		return (1);
 	}
 	exit_code = ft_atoi(args[1]);
+	free_commands(cmds_head);
 	exit(exit_code);
 }

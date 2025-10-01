@@ -1,4 +1,4 @@
-C = cc
+CC = cc
 CFLAGS = -Wall -Wextra -Werror -Iinclude
 
 UNAME_S := $(shell uname -s)
@@ -34,7 +34,10 @@ SRC = src/signals/signals.c \
 	src/builtins/builtin_export.c \
 	src/builtins/builtin_unset.c \
 	src/builtins/builtin_env.c \
-	src/builtins/builtin_exit.c
+	src/builtins/builtin_exit.c \
+	src/parsing/lexer_utils.c \
+	src/builtins/export_utils.c \
+	src/execution/utils.c
 	
 HEADER = include/minishell.h
 
@@ -65,7 +68,9 @@ force:
 	@mkdir -p $(dir $(OBJ_DIR)/$(@D))
 	$(CC) $(CFLAGS) -c $< -o $(OBJ_DIR)/$@
 
-$(OBJ_DIR)/%.o: src/%.c $(HEADER) Makefile
+# Ensure object directory exists before compiling any object, and create subdirs as needed
+$(OBJ_DIR)/%.o: src/%.c $(HEADER) Makefile | $(OBJ_DIR)
+	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -O3 -c $< -o $@
 
 clean:
@@ -77,4 +82,22 @@ fclean: clean
 
 re: fclean all
 
-.PHONY: all clean fclean re force
+# AddressSanitizer/UBSan build
+asan: CFLAGS += -g3 -fsanitize=address,undefined -fno-omit-frame-pointer
+asan: re
+
+# Valgrind interactive session
+debug: CFLAGS += -g3
+debug: re
+	valgrind --leak-check=full\
+		--track-origins=yes\
+		--show-leak-kinds=all\
+		--trace-children=yes \
+		--suppressions=readline.supp \
+		./$(NAME)
+
+# Batch leak checks
+leaks: re
+	bash tests/run_leak_checks.sh
+
+.PHONY: all clean fclean re force debug asan leaks

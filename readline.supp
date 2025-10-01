@@ -1,0 +1,12 @@
+{
+   Readline_All_Functions
+   Memcheck:Leak
+   ...
+   obj:*/libreadline.so*
+}
+{
+   Readline_All_Functions
+   Memcheck:Leak
+   ...
+   obj:/usr/bin/*
+}

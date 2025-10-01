@@ -6,7 +6,7 @@
 /*   By: dedme <dedme@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 21:49:53 by mregnaut          #+#    #+#             */
-/*   Updated: 2025/09/28 20:18:57 by dedme            ###   ########.fr       */
+/*   Updated: 2025/10/01 15:59:54 by dedme            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ void	handle_signals(void)
 void	handle_signals_heredoc(int sig)
 {
 	(void)sig;
-    g_exit_status = 130;
+	g_exit_status = 130;
 	rl_replace_line("", 0);
 	rl_done = 1;
 }

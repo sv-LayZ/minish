@@ -64,7 +64,7 @@ static int	setup_pipe_redirections(int pipes[][2],
 }
 
 static int	execute_piped_command(t_cmd *cmd, int pipes[][2],
-	int cmd_index, int total_cmds)
+	int cmd_index, int total_cmds, t_cmd *cmds_head)
 {
 	pid_t	pid;
 	int		builtin_index;
@@ -78,19 +78,44 @@ static int	execute_piped_command(t_cmd *cmd, int pipes[][2],
 	if (pid == 0)
 	{
 		if (setup_pipe_redirections(pipes, cmd_index, total_cmds) == -1)
+		{
+			free_commands(cmds_head);
 			exit(1);
+		}
 		close_pipe_fds(pipes, total_cmds - 1);
 		if (cmd->redirections && apply_redirections(cmd->redirections) == -1)
+		{
+			free_commands(cmds_head);
 			exit(1);
+		}
 		builtin_index = is_builtin(cmd->args[0]);
 		if (builtin_index != -1)
-			exit(execute_builtin(builtin_index, cmd->args));
+		{
+			builtin_index = execute_builtin(builtin_index, cmd->args, cmds_head);
+			free_commands(cmds_head);
+			exit(builtin_index);
+		}
 		else
-			exit(execute_external_command(cmd->args));
+		{
+			builtin_index = execute_external_command(cmd->args);
+			free_commands(cmds_head);
+			exit(builtin_index);
+		}
 	}
 	return (pid);
 }
 
+/*
+ * @brief Exécute un pipeline de commandes connectées par des pipes
+ * 
+ * 1. Compte les commandes et crée les pipes nécessaires
+ * 2. Fork un processus pour chaque commande
+ * 3. Connecte stdin/stdout via les pipes
+ * 4. Attend tous les processus et retourne le statut de la dernière commande
+ * 
+ * @param cmd Liste chaînée de commandes à exécuter
+ * @return Code de sortie de la dernière commande
+*/
 int	execute_pipeline(t_cmd *cmd)
 {
 	int		total_cmds;
@@ -123,7 +148,7 @@ int	execute_pipeline(t_cmd *cmd)
 	i = 0;
 	while (current && i < total_cmds)
 	{
-		pids[i] = execute_piped_command(current, pipes, i, total_cmds);
+		pids[i] = execute_piped_command(current, pipes, i, total_cmds, cmd);
 		if (pids[i] == -1)
 		{
 			close_pipe_fds(pipes, total_cmds - 1);

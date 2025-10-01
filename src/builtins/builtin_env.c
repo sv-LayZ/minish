@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtin_env.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mregnaut <mregnaut@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: dedme <dedme@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/23 21:35:47 by mregnaut          #+#    #+#             */
-/*   Updated: 2025/09/15 17:04:16 by mregnaut         ###   ########.fr       */
+/*   Updated: 2025/10/02 00:00:39 by dedme            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ int	builtin_env(char **args)
 			|| ft_strncmp(environ[i], "LINES=", 6) == 0)
 		{
 			i++;
-			continue;
+			continue ;
 		}
 		printf("%s\n", environ[i]);
 		i++;

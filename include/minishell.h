@@ -6,7 +6,7 @@
 /*   By: dedme <dedme@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/15 19:58:52 by mregnaut          #+#    #+#             */
-/*   Updated: 2025/09/29 01:26:09 by dedme            ###   ########.fr       */
+/*   Updated: 2025/10/02 01:41:24 by dedme            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,8 +28,8 @@
 # include <sys/types.h>
 # include <sys/wait.h>
 # include "../libft/libft.h"
-# include "builtin.h"
 # include "parsing.h"
+# include "builtin.h"
 
 # define ENV_SEPARATOR ':'
 # define ENV_PATH "PATH"
@@ -60,11 +60,7 @@ void	print_commands(t_cmd *cmds);
 /* EXECUTION */
 int		execute_command(t_cmd *cmd);
 int		execute_pipeline(t_cmd *cmd);
-int		setup_input_redirection(t_cmd *cmd);
-int		setup_output_redirection(t_cmd *cmd);
 int		apply_redirections(t_redir *redirections);
-int		is_builtin(char *cmd);
-int		execute_builtin(int builtin_index, char **args);
 int		execute_external_command(char **args);
 int		execute_with_redirections(t_cmd *cmd);
 int		execute_builtin_with_redirections(t_cmd *cmd, int builtin_index);
@@ -72,6 +68,12 @@ int		execute_external_with_redirections(t_cmd *cmd);
 char	*find_executable_in_path(char *cmd);
 int		consume_heredocs(t_redir *redirections);
 int		handle_heredoc(char *delimiter, int count, int expand);
+void	free_string_array(char **array);
+char	*search_in_paths(char **paths, char *cmd);
+int		redir_out(char *file, int type);
+int		redir_in(char *file);
+char	*create_tmpfile(int count);
+
 
 
 /* EXECUTABLE */

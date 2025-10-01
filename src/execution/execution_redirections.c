@@ -19,6 +19,7 @@ int	execute_builtin_with_redirections(t_cmd *cmd, int builtin_index)
 {
 	pid_t	pid;
 	int		status;
+	int		exit_code;
 
 	pid = fork();
 	if (pid == -1)
@@ -31,9 +32,14 @@ int	execute_builtin_with_redirections(t_cmd *cmd, int builtin_index)
 		if (cmd->redirections)
 		{
 			if (apply_redirections(cmd->redirections) == -1)
+			{
+				free_commands(cmd);
 				exit(1);
+			}
 		}
-		exit(execute_builtin(builtin_index, cmd->args));
+		exit_code = execute_builtin(builtin_index, cmd->args, cmd);
+		free_commands(cmd);
+		exit(exit_code);
 	}
 	else
 	{
@@ -49,12 +55,16 @@ static int	execute_child_with_redirections(t_cmd *cmd, char *executable_path)
 	if (cmd->redirections)
 	{
 		if (apply_redirections(cmd->redirections) == -1)
+		{
+			free_commands(cmd);
 			exit(1);
+		}
 	}
 	if (execve(executable_path, cmd->args, environ) == -1)
 	{
 		perror("execve");
 		free(executable_path);
+		free_commands(cmd);
 		exit(127);
 	}
 	return (0);

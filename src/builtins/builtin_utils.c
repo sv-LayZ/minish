@@ -29,11 +29,13 @@ int	is_builtin(char *cmd)
 	return (-1);
 }
 
-int	execute_builtin(int index, char **args)
+int	execute_builtin(int index, char **args, t_cmd *cmds_head)
 {
 	static int	(*builtin_func[])(char **) = {BUILTIN_FUNCS};
 
 	if (index == -1)
 		return (-1);
+	if (index == 6)
+		return (builtin_exit(args, cmds_head));
 	return (builtin_func[index](args));
 }

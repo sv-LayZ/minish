@@ -6,7 +6,7 @@
 /*   By: dedme <dedme@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 23:00:58 by mregnaut          #+#    #+#             */
-/*   Updated: 2025/09/29 02:24:37 by dedme            ###   ########.fr       */
+/*   Updated: 2025/10/01 18:20:21 by dedme            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,10 +14,47 @@
 
 int	g_exit_status = 0;
 
+static void	handle_only_heredoc(t_cmd *cmds)
+{
+	int		only_heredoc;
+	t_redir	*r;
+
+	only_heredoc = 1;
+	r = cmds->redirections;
+	while (r)
+	{
+		if (r->type != TOKEN_HEREDOC)
+			only_heredoc = 0;
+		r = r->next;
+	}
+	if (!only_heredoc)
+		return ;
+	if (consume_heredocs(cmds->redirections) == 0 && g_exit_status == 0)
+		g_exit_status = 0;
+	else if (g_exit_status != 130 && g_exit_status != 0)
+		g_exit_status = 1;
+}
+
+static void	process_line(char *line)
+{
+	t_cmd	*cmds;
+
+	cmds = parsing(line);
+	if (DEBUGGING)
+		debug_print_cmd(cmds);
+	if (cmds)
+	{
+		if ((!cmds->args || !cmds->args[0]) && cmds->redirections)
+			handle_only_heredoc(cmds);
+		else if (cmds->args && cmds->args[0])
+			g_exit_status = execute_pipeline(cmds);
+	}
+	free_commands(cmds);
+}
+
 int	main(int ac, char **av)
 {
 	char	*line;
-	t_cmd	*cmds;
 
 	(void)ac;
 	(void)av;
@@ -29,38 +66,7 @@ int	main(int ac, char **av)
 			continue ;
 		if (ft_strlen(line) > 0)
 			add_history(line);
-		cmds = parsing(line);
-		if (DEBUGGING)
-			debug_print_cmd(cmds);
-		if (cmds)
-		{
-			/* Si la ligne ne contient que des heredocs (ex: <<e<<e) sans commande,
-			 * on doit quand même les consommer comme bash --posix, puis ne rien exécuter. */
-			if ((!cmds->args || !cmds->args[0]) && cmds->redirections)
-			{
-				int		only_heredoc = 1;
-				t_redir	*r = cmds->redirections;
-				while (r)
-				{
-					if (r->type != TOKEN_HEREDOC)
-					{
-						only_heredoc = 0;
-						break;
-					}
-					r = r->next;
-				}
-				if (only_heredoc)
-				{
-					if (consume_heredocs(cmds->redirections) == 0 && g_exit_status == 0)
-						g_exit_status = 0;
-					else if (g_exit_status != 130 && g_exit_status != 0)
-						g_exit_status = 1;
-				}
-			}
-			else if (cmds->args && cmds->args[0])
-				g_exit_status = execute_pipeline(cmds);
-		}
-		free_commands(cmds);
+		process_line(line);
 		free(line);
 	}
 	return (0);

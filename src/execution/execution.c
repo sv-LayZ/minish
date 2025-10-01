@@ -13,6 +13,9 @@
 #include "../include/minishell.h"
 #include "../include/parsing.h"
 
+/*
+ * Execute une seule commande (SANS PIPE !).
+*/
 int	execute_command(t_cmd *cmd)
 {
 	int	builtin_index;
@@ -24,7 +27,7 @@ int	execute_command(t_cmd *cmd)
 		return (execute_with_redirections(cmd));
 	builtin_index = is_builtin(cmd->args[0]);
 	if (builtin_index != -1)
-		exit_code = execute_builtin(builtin_index, cmd->args);
+		exit_code = execute_builtin(builtin_index, cmd->args, cmd);
 	else
 		exit_code = execute_external_command(cmd->args);
 	return (exit_code);
