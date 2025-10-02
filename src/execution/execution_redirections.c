@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   execution_redirections.c                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mregnaut <mregnaut@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: dedme <dedme@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/01 00:00:00 by mregnaut          #+#    #+#             */
-/*   Updated: 2025/09/16 03:21:55 by mregnaut         ###   ########.fr       */
+/*   Updated: 2025/10/02 16:37:09 by dedme            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,39 +15,40 @@
 
 extern char	**environ;
 
+static void	child_builtin(t_cmd *cmd, int builtin_index)
+{
+	int	exit_code;
+
+	if (cmd->redirections && apply_redirections(cmd->redirections) == -1)
+	{
+		free_commands(cmd);
+		exit(1);
+	}
+	exit_code = execute_builtin(builtin_index, cmd->args, cmd);
+	free_commands(cmd);
+	exit(exit_code);
+}
+
+static int	parent_builtin(pid_t pid)
+{
+	int	status;
+
+	waitpid(pid, &status, 0);
+	if (WIFEXITED(status))
+		return (WEXITSTATUS(status));
+	return (128 + WTERMSIG(status));
+}
+
 int	execute_builtin_with_redirections(t_cmd *cmd, int builtin_index)
 {
 	pid_t	pid;
-	int		status;
-	int		exit_code;
 
 	pid = fork();
 	if (pid == -1)
-	{
-		perror("fork");
-		return (1);
-	}
+		return (perror("fork"), 1);
 	if (pid == 0)
-	{
-		if (cmd->redirections)
-		{
-			if (apply_redirections(cmd->redirections) == -1)
-			{
-				free_commands(cmd);
-				exit(1);
-			}
-		}
-		exit_code = execute_builtin(builtin_index, cmd->args, cmd);
-		free_commands(cmd);
-		exit(exit_code);
-	}
-	else
-	{
-		waitpid(pid, &status, 0);
-		if (WIFEXITED(status))
-			return (WEXITSTATUS(status));
-		return (128 + WTERMSIG(status));
-	}
+		child_builtin(cmd, builtin_index);
+	return (parent_builtin(pid));
 }
 
 static int	execute_child_with_redirections(t_cmd *cmd, char *executable_path)
