@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipeline.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mregnaut <mregnaut@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: dedme <dedme@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/22 12:00:00 by mregnaut          #+#    #+#             */
-/*   Updated: 2025/09/16 03:22:14 by dedme            ###   ########.fr       */
+/*   Updated: 2025/10/02 19:30:26 by dedme            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,8 +41,8 @@ static void	close_pipe_fds(int pipes[][2], int count)
 	}
 }
 
-static int	setup_pipe_redirections(int pipes[][2],
-	int cmd_index, int total_cmds)
+static int	setup_pipe_redirections(int pipes[][2], int cmd_index,
+		int total_cmds)
 {
 	if (cmd_index > 0)
 	{
@@ -63,8 +63,8 @@ static int	setup_pipe_redirections(int pipes[][2],
 	return (0);
 }
 
-static int	execute_piped_command(t_cmd *cmd, int pipes[][2],
-	int cmd_index, int total_cmds, t_cmd *cmds_head)
+static int	execute_piped_command(t_cmd *cmd, int pipes[][2], int cmd_index,
+		int total_cmds, t_cmd *cmds_head)
 {
 	pid_t	pid;
 	int		builtin_index;
@@ -91,7 +91,8 @@ static int	execute_piped_command(t_cmd *cmd, int pipes[][2],
 		builtin_index = is_builtin(cmd->args[0]);
 		if (builtin_index != -1)
 		{
-			builtin_index = execute_builtin(builtin_index, cmd->args, cmds_head);
+			builtin_index = execute_builtin(builtin_index, cmd->args,
+					cmds_head);
 			free_commands(cmds_head);
 			exit(builtin_index);
 		}
@@ -105,17 +106,6 @@ static int	execute_piped_command(t_cmd *cmd, int pipes[][2],
 	return (pid);
 }
 
-/*
- * @brief Exécute un pipeline de commandes connectées par des pipes
- * 
- * 1. Compte les commandes et crée les pipes nécessaires
- * 2. Fork un processus pour chaque commande
- * 3. Connecte stdin/stdout via les pipes
- * 4. Attend tous les processus et retourne le statut de la dernière commande
- * 
- * @param cmd Liste chaînée de commandes à exécuter
- * @return Code de sortie de la dernière commande
-*/
 int	execute_pipeline(t_cmd *cmd)
 {
 	int		total_cmds;

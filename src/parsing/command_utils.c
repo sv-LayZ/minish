@@ -6,7 +6,7 @@
 /*   By: dedme <dedme@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/15 20:09:00 by mregnaut          #+#    #+#             */
-/*   Updated: 2025/10/01 15:45:20 by dedme            ###   ########.fr       */
+/*   Updated: 2025/10/02 19:27:07 by dedme            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,18 +35,6 @@ static int	count_args(char **args)
 	while (args && args[i])
 		i++;
 	return (i);
-}
-
-static void	copy_args(char **dest, char **src, int argc)
-{
-	int	i;
-
-	i = 0;
-	while (i < argc)
-	{
-		dest[i] = src[i];
-		i++;
-	}
 }
 
 int	add_argument(t_cmd *cmd, char *arg)

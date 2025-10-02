@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   expand_variables.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: GitHub Copilot                                 +#+  +:+       +#+        */
+/*   By: dedme <dedme@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/29 12:00:00 by ai-helper         #+#    #+#             */
-/*   Updated: 2025/09/29 12:00:00 by ai-helper        ###   ########.fr       */
+/*   Updated: 2025/10/02 19:40:42 by dedme            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,10 @@ static int	ensure_capacity(char **buf, size_t *cap, size_t needed)
 
 	if (*cap >= needed)
 		return (1);
-	newcap = *cap ? *cap : 64;
+	if (*cap)
+		newcap = *cap;
+	else
+		newcap = 64;
 	while (newcap < needed)
 		newcap *= 2;
 	newbuf = (char *)malloc(newcap);
@@ -27,7 +30,10 @@ static int	ensure_capacity(char **buf, size_t *cap, size_t needed)
 		return (0);
 	if (*buf)
 	{
-		ft_memcpy(newbuf, *buf, needed < *cap ? needed : *cap);
+		if (needed < *cap)
+			ft_memcpy(newbuf, *buf, needed);
+		else
+			ft_memcpy(newbuf, *buf, *cap);
 		free(*buf);
 	}
 	*buf = newbuf;

@@ -6,7 +6,7 @@
 /*   By: dedme <dedme@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/15 20:06:00 by mregnaut          #+#    #+#             */
-/*   Updated: 2025/10/01 18:54:07 by dedme            ###   ########.fr       */
+/*   Updated: 2025/10/02 19:25:53 by dedme            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,15 +34,6 @@ static void	handle_operator(const char *line, int *i, t_token **tokens)
 	}
 }
 
-static t_quote_type	get_start_quote(const char *line, int *i)
-{
-	if (line[*i] == '\'')
-		return ((*i)++, SINGLE_QUOTE);
-	if (line[*i] == '"')
-		return ((*i)++, DOUBLE_QUOTE);
-	return (NO_QUOTE);
-}
-
 static int	scan_word(const char *line, int *i, t_quote_type q)
 {
 	int	start;
@@ -58,22 +49,6 @@ static int	scan_word(const char *line, int *i, t_quote_type q)
 	return (start);
 }
 
-static void	add_word_token(const char *line, int s, int e,
-		t_quote_type q, t_token **tokens)
-{
-	char	*value;
-
-	if (e > s)
-	{
-		value = extract_word(line, s, e);
-		if (value)
-		{
-			append_token(tokens, create_token(TOKEN_ARGUMENT, value, q));
-			free(value);
-		}
-	}
-}
-
 static void	handle_word_or_quote(const char *line, int *i, t_token **tokens)
 {
 	int				start;
@@ -85,7 +60,6 @@ static void	handle_word_or_quote(const char *line, int *i, t_token **tokens)
 	end = *i;
 	add_word_token(line, start, end, start_quote, tokens);
 }
-
 
 static t_token	*tokenize_line(const char *line)
 {

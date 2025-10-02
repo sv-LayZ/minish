@@ -6,7 +6,7 @@
 /*   By: dedme <dedme@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/15 19:58:52 by mregnaut          #+#    #+#             */
-/*   Updated: 2025/10/02 01:41:24 by dedme            ###   ########.fr       */
+/*   Updated: 2025/10/02 18:53:10 by dedme            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,8 +73,8 @@ char	*search_in_paths(char **paths, char *cmd);
 int		redir_out(char *file, int type);
 int		redir_in(char *file);
 char	*create_tmpfile(int count);
-
-
+void	child_builtin(t_cmd *cmd, int builtin_index);
+int		parent_builtin(pid_t pid);
 
 /* EXECUTABLE */
 t_list	*get_files_in_dir(char *path);

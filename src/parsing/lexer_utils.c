@@ -6,7 +6,7 @@
 /*   By: dedme <dedme@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/01 16:10:14 by dedme             #+#    #+#             */
-/*   Updated: 2025/10/01 18:56:50 by dedme            ###   ########.fr       */
+/*   Updated: 2025/10/02 19:25:43 by dedme            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,4 +46,29 @@ char	*extract_word(const char *line, int start, int end)
 		word[i++] = line[start++];
 	word[i] = '\0';
 	return (word);
+}
+
+void	add_word_token(const char *line, int s, int e,
+		t_quote_type q, t_token **tokens)
+{
+	char	*value;
+
+	if (e > s)
+	{
+		value = extract_word(line, s, e);
+		if (value)
+		{
+			append_token(tokens, create_token(TOKEN_ARGUMENT, value, q));
+			free(value);
+		}
+	}
+}
+
+t_quote_type	get_start_quote(const char *line, int *i)
+{
+	if (line[*i] == '\'')
+		return ((*i)++, SINGLE_QUOTE);
+	if (line[*i] == '"')
+		return ((*i)++, DOUBLE_QUOTE);
+	return (NO_QUOTE);
 }

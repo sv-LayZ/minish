@@ -6,7 +6,7 @@
 /*   By: dedme <dedme@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/15 19:58:58 by mregnaut          #+#    #+#             */
-/*   Updated: 2025/10/01 18:55:27 by dedme            ###   ########.fr       */
+/*   Updated: 2025/10/02 19:33:07 by dedme            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,12 +68,15 @@ typedef struct s_cmd
 }	t_cmd;
 
 /* PARSING FUNCTIONS */
-t_token		*lexer(const char *line);
-t_cmd		*parser(t_token *tokens);
-t_cmd		*parsing(char *line);
-int			get_operator_length(const char *line, int i);
-int			skip_whitespace(const char *line, int i);
-char		*extract_word(const char *line, int start, int end);
+t_token			*lexer(const char *line);
+t_cmd			*parser(t_token *tokens);
+t_cmd			*parsing(char *line);
+int				get_operator_length(const char *line, int i);
+int				skip_whitespace(const char *line, int i);
+char			*extract_word(const char *line, int start, int end);
+void			add_word_token(const char *line, int s, int e, t_quote_type q, t_token **tokens);
+t_quote_type	get_start_quote(const char *line, int *i);
+void			copy_args(char **dest, char **src, int argc);
 
 /* TOKEN FUNCTIONS */
 t_token		*create_token(t_token_type t, const char *v, t_quote_type q);

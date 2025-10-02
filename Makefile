@@ -37,7 +37,9 @@ SRC = src/signals/signals.c \
 	src/builtins/builtin_exit.c \
 	src/parsing/lexer_utils.c \
 	src/builtins/export_utils.c \
-	src/execution/utils.c
+	src/execution/utils.c \
+	src/execution/redirections_utils.c \
+	src/parsing/utils.c
 	
 HEADER = include/minishell.h
 
