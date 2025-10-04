@@ -15,7 +15,7 @@
 # include "minishell.h"
 
 /* DEBUGGING */
-# define DEBUGGING 1
+# define DEBUGGING 0
 
 /* TOKEN TYPES */
 typedef enum e_token_type
